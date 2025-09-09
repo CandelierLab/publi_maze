@@ -1,6 +1,6 @@
 # Maze
 
-Python code of the article "Maze-solving with density-driven swarms" by E. M. Zamora Sánchez *et al.*
+Python code for the article "Maze-solving with density-driven swarms" by E. M. Zamora Sánchez *et al.*
 
 ## Installation
 
