@@ -74,6 +74,5 @@ E.animation.window.information.show_locking = False
 # Trigger
 E.trigger = 0.9
 
-
 # Run
 E.run()
