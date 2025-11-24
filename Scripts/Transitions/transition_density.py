@@ -29,7 +29,13 @@ algo = 'Prims'
 # Parameters
 ndpd = 16
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
-l_eta = np.array([100])
+
+# print(l_dst[16])
+# import sys
+# sys.exit()
+l_dst = [l_dst[16]]
+
+l_eta = [100]
 
 # ─── Simulation
 
@@ -37,7 +43,12 @@ l_eta = np.array([100])
 n_mazes = 10
 n_runs = 100
 trigger = 0.9
-max_steps = int(1e5)
+max_steps = int(1e8)
+
+# print(l_dst[16])
+
+# import sys
+# sys.exit()
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
