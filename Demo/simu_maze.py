@@ -24,7 +24,7 @@ import Animation.maze
 multi = 1
 # Maze
 
-a = 20
+a = 3
 seed = 0
 
 # algo = 'AldousBroder'
@@ -41,7 +41,7 @@ algo = 'Prims'
 # Agents
 density = 5
 
-eta = 100
+eta = 0
 gamma = 10
 
 # ═══ Computation ══════════════════════════════════════════════════════════
@@ -54,7 +54,7 @@ M.create_LR_loop()
 # ─── Engine ───────────────────────────────────────────────────────────────
 
 # E = Engine(M.graph, multi=multi)
-E = Engine(M.graph, platform='CPU')
+E = Engine(M.graph, platform='GPU')
 
 # ─── Agents ───────────────────────────────────────────────────────────────
 
@@ -72,7 +72,7 @@ E.animation.window.information.show_locking = False
 # ═══ Simulation ═══════════════════════════════════════════════════════════
 
 # Trigger
-E.trigger = 0.9
+# E.trigger = 0.9
 
 # Run
 E.run()
