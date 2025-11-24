@@ -160,7 +160,10 @@ class CPU_engine:
 
           # Soft max
           Z = np.exp(flows*self.engine.agents.gamma/self.ni[u,i])
-          k = np.random.choice(np.arange(flows.size), p=Z/np.sum(Z))
+          try:
+            k = np.random.choice(np.arange(flows.size), p=Z/np.sum(Z))
+          except:
+            k = 0
 
         # Update position
         self.engine.agents.position[u,id] = self.edges[i,k]

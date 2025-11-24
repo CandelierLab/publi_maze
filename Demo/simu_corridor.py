@@ -21,11 +21,11 @@ import Animation.maze
 multi = 1
 
 # Maze
-a = 10
+a = 20
 
 # Agents
 density = 5
-eta = 10
+eta = 0
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
@@ -35,7 +35,7 @@ M = corridor(size=a, periodic=False)
 
 # ─── Engine ───────────────────────────────────────────────────────────────
 
-E = Engine(M.graph, platform='CPU')
+E = Engine(M.graph, platform='GPU')
 
 # ─── Agents ───────────────────────────────────────────────────────────────
 
@@ -46,7 +46,7 @@ E.add_agents(N, eta)
 
 E.setup_display(Animation.maze.density, maze=M)
 
-E.animation.colormap.range = [0,density*10]
+E.animation.colormap.range = [0,density*5]
 
 # Information
 E.animation.window.information.show_time = False
