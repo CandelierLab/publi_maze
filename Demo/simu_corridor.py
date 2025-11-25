@@ -21,11 +21,11 @@ import Animation.maze
 multi = 1
 
 # Maze
-a = 20
+a = 50
 
 # Agents
 density = 5
-eta = 0
+eta = 100
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
