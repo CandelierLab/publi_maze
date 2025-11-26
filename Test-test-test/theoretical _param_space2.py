@@ -9,6 +9,8 @@ os.system('clear')
 import numpy as np
 
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+
 
 plt.style.use('dark_background')
 
@@ -22,6 +24,10 @@ l_eta = np.geomspace(1, 1000, 50)
 l_x0 = np.geomspace(0.1, Nmax, 100)
 l_d = np.geomspace(0.1, dmax, 50)
 
+# ──────────────────────────────────────────────────────────────────────────
+
+K = np.log(a**2)/np.log(2)
+
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 lmbd = round(1.612*a**1.044)
@@ -30,8 +36,32 @@ fig, ax = plt.subplots(1,1)
 # fig, ax = plt.subplots(1,2, figsize=(15,6))
 # cm = plt.cm.turbo(np.linspace(0, 1, l_x0.size))
 
+# ─── Colormap ──────────────────────────────────
+
+cdict = {'red':   [[0.0,  0.0, 0.0],
+                   [0.10, 0.0, 0.0],
+                   [0.15, 0.0, 0.0],
+                   [0.75, 1.0, 1.0],
+                   [1.0,  1.0, 1.0]],
+         'green': [[0.0,  1.0, 1.0],
+                   [0.10, 0.8, 0.8],
+                   [0.15, 0.2, 0.2],
+                   [0.40, 0.0, 0.0],
+                   [0.90, 1.0, 1.0],
+                   [1.0,  1.0, 1.0]],
+         'blue':  [[0.0,  1.0, 1.0],
+                   [0.10, 1.0, 1.0],
+                   [0.15, 0.8, 0.8],
+                   [0.75, 0.0, 0.0],
+                   [1.0,  1.0, 1.0]]}
+
+cm = LinearSegmentedColormap('testCmap', segmentdata=cdict, N=256)
+
+# ─── Computation ───────────────────────────────
+
 pL = np.zeros((l_eta.size, l_d.size))
 v = np.zeros((l_eta.size, l_d.size))
+tau_agg = np.zeros((l_eta.size, l_d.size))
 
 for i, eta in enumerate(l_eta):
 
@@ -54,7 +84,7 @@ for i, eta in enumerate(l_eta):
       P *= 1-bk
 
   # Convert to density
-  d = N*10/a**2
+  d = N/lmbd
 
   # Interpolation
   X0 = np.interp(l_d, d, l_x0)
@@ -65,6 +95,9 @@ for i, eta in enumerate(l_eta):
 
     # Head speed
     v[i,j] = x0/(x0+eta)
+
+    # Aggregation time
+    tau_agg[i,j] = 2*(a**2 - lmbd) # + K*eta - 1
 
     # Probability of sufficient length
     P = 1
@@ -84,9 +117,11 @@ pL[pL<1e-10] = 1e-10
 
 X, Y = np.meshgrid(l_d, l_eta)
 
-# ─── L ────────────────────────────────────────────────────────────────────
+# ─── tau ────────────────────────────────────────────────────────────────────
 
-c = ax.pcolormesh(X, Y, np.log10(1/pL/v*a**2), vmin=2.5, vmax=5, rasterized=True)
+tau = tau_agg/pL/v
+
+c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=2.5, vmax=5, rasterized=True)
 fig.colorbar(c, ax=ax)
 
 ax.set_xscale('log')
