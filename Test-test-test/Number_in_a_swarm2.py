@@ -3,7 +3,7 @@ Number of agents in a swarm
 '''
 
 # Reset command window display
-import os, sys
+import os
 os.system('clear')
 
 import numpy as np
