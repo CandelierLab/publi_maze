@@ -17,21 +17,13 @@ plt.style.use('dark_background')
 # ═══ Parameters ═══════════════════════════════════════════════════════════
 
 a = 20
-dmax = 100
-Nmax = dmax*a**2
 
 l_eta = np.geomspace(1, 1000, 50)
-# l_x0 = np.geomspace(0.1, Nmax, 100)
-l_d = np.geomspace(0.1, dmax, 50)
-
-# ──────────────────────────────────────────────────────────────────────────
-
-K = np.log(a**2)/np.log(2)
+l_d = np.geomspace(0.1, 100, 50)
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 lmbd = round(1.612*a**1.044)
-print(lmbd)
 
 def N2x0(N, eta):
   x = np.real(eta*lambertw(np.exp((N+1)/eta)/eta)-1)
@@ -44,9 +36,10 @@ def N2x0(N, eta):
 
 fig, ax = plt.subplots(1,1)
 # fig, ax = plt.subplots(1,2, figsize=(15,6))
-# cm = plt.cm.turbo(np.linspace(0, 1, l_x0.size))
 
 # ─── Colormap ──────────────────────────────────
+
+# cm = plt.cm.turbo(np.linspace(0, 1, l_x0.size))
 
 cdict = {'red':   [[0.0,  0.0, 0.0],
                    [0.10, 0.0, 0.0],
@@ -101,10 +94,11 @@ for i, eta in enumerate(l_eta):
     # Probability of sufficient length
     P = 1
 
+    x = eta/(np.arange(lmbd+1) + eta/x0)
+
     for k in range(lmbd):
 
-      xk = eta/(k + eta/x0)
-      bk = (xk/(xk+eta))**xk
+      bk = ((x[k]/(x[k]+eta))**x[k])*((eta/(x[k+1]+eta))**x[k+1])
       pL[i,j] += bk*P
       P *= 1-bk
 
