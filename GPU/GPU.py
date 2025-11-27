@@ -26,7 +26,7 @@ class GPU_engine:
 
     # ─── Import options ────────────────────────
 
-    self.import_density = False
+    self.import_density = self.engine.store_blanks    # False by default
     self.import_flow = False
     self.import_position = False
     self.import_origin = False
@@ -235,6 +235,14 @@ class GPU_engine:
     if self.engine.store_success or (self.engine.storage is not None and self.engine.storage.save_success):
       for k in range(self.multi):
         self.engine.l_success[k].append(self.engine.success[k].item())
+
+    # Import blanks
+    if self.engine.store_blanks:
+
+      blanks = np.count_nonzero(self.h_dns==0, axis=1)
+
+      for k in range(self.multi):
+        self.engine.l_blanks[k].append(blanks[k].item())    
 
   # ────────────────────────────────────────────────────────────────────────
   def step(self):

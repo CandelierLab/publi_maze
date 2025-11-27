@@ -31,9 +31,16 @@ K = np.log(a**2)/np.log(2)
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 lmbd = round(1.612*a**1.044)
+print(lmbd)
 
 def N2x0(N, eta):
-  return eta*lambertw(np.exp((N+1)/eta)/eta)-1
+  x = np.real(eta*lambertw(np.exp((N+1)/eta)/eta)-1)
+
+  # Manage infinite values
+  I = x==np.inf
+  x[I] = N[I]
+
+  return x
 
 fig, ax = plt.subplots(1,1)
 # fig, ax = plt.subplots(1,2, figsize=(15,6))

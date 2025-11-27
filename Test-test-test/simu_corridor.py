@@ -13,6 +13,7 @@ from maze import corridor
 from engine import Engine
 
 # Display
+import anim
 import Animation.maze
 
 # ═══ Parameters ═══════════════════════════════════════════════════════════
@@ -24,8 +25,8 @@ multi = 1
 a = 37
 
 # Agents
-density = 10
-eta = 50
+density = 5
+eta = 10
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
@@ -46,6 +47,9 @@ E.add_agents(N, eta)
 
 E.setup_display(Animation.maze.density, maze=M)
 
+E.animation.colormap = anim.colormap(name='inferno', ncolors=density*5+1)
+E.animation.colormap.cmap.colors[0,0:3] = 1.0
+print(E.animation.colormap.cmap.colors)
 E.animation.colormap.range = [0,density*5]
 
 # Information

@@ -93,6 +93,7 @@ class Engine:
 
     self.store_steps = None
     self.store_success = True
+    self.store_blanks = False
     self.store_densities = False
     self.store_trajectories = False
 
@@ -104,6 +105,7 @@ class Engine:
 
     # Saving options
     self.save_success = False
+    self.save_blanks = False
     self.save_trajectories = False
 
     # ─── Random number generator
@@ -174,6 +176,10 @@ class Engine:
     # Reset success
     if self.store_success:
       self.l_success = [[] for i in range(self.multi)]
+
+    # Reset blanks
+    if self.store_blanks:
+      self.l_blanks = [[] for i in range(self.multi)]
 
     match self.platform.upper():
 
@@ -357,6 +363,17 @@ class Engine:
             case 'CPU': self.cpu.step()
 
           hf['success'] = self.l_success
+
+        # ─── Blanks
+
+        if self.storage.save_blanks:
+
+          # One last iteration
+          match self.platform.upper():
+            case 'GPU': self.gpu.step()
+            case 'CPU': self.cpu.step()
+
+          hf['blanks'] = self.l_blanks
         
     # ─── Display ───────────────────────────────
     
@@ -413,4 +430,5 @@ class Engine:
     self._storage.save_maze = False
     self._storage.save_trajectories = False
     self._storage.save_success = False
+    self._storage.save_blanks = False
 
