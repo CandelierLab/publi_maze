@@ -25,12 +25,12 @@ lmbd = 37
 # ─── Agents
 
 # Parameters
-ndpd = 16
+ndpd = 32
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
-l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
+# l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
 # l_dst = np.array([5])
-# l_eta = np.array([10])
+l_eta = np.array([100])
 
 # ─── Simulation
 
