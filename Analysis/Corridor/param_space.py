@@ -38,27 +38,40 @@ base_tag = f'Loop a={lmbd}' + os.sep
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
-# Fixing ratio
-xi = np.full((l_eta.size, l_dst.size), fill_value=np.nan)
+strg = storage(base_tag + f'xi.h5')
 
-for i, eta in enumerate(l_eta):
+if strg.exists():
 
-  tshift = int(eta*lmbd)
+  xi = strg['xi']
 
-  for j, dst in enumerate(l_dst):
+else:
 
-    # ─── Storage ─────────────────────────────
+  # Fixing ratio
+  xi = np.full((l_eta.size, l_dst.size), fill_value=np.nan)
 
-    S = storage(base_tag + f'density={dst:.03f} - eta={eta:.01f}.h5')
+  for i, eta in enumerate(l_eta):
 
-    # Skip absent files
-    if not S.exists(): continue
+    tshift = int(eta*lmbd)
 
-    # Load blanks
-    Nb = S['blanks'][:, tshift:]
+    for j, dst in enumerate(l_dst):
 
-    # Compute fixing ratio xi
-    xi[i,j] = np.count_nonzero(Nb==0)/Nb.size
+      # ─── Storage ─────────────────────────────
+
+      S = storage(base_tag + f'density={dst:.03f} - eta={eta:.01f}.h5')
+
+      # Skip absent files
+      if not S.exists(): continue
+
+      # Load blanks
+      Nb = S['blanks'][:, tshift:]
+
+      # Compute fixing ratio xi
+      xi[i,j] = np.count_nonzero(Nb==0)/Nb.size
+
+      print('Computing', i,j)
+
+  # Store
+  strg['xi'] = xi
 
 # ═══ Figure ════════════════════════════════════════════════════════
 
