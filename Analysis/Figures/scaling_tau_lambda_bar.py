@@ -26,7 +26,8 @@ l_a = np.arange(5,51)
 
 # ─── Figure ───────────────────────────────────────────────────────────────
 
-fig, ax = plt.subplots(1,1, figsize=(3.3, 3.3))
+# fig, ax = plt.subplots(1,1, figsize=(3.3, 3.3))
+fig, ax = plt.subplots(1,1, figsize=(7, 7))
 cm = plt.cm.turbo(np.linspace(0, 1, len(l_algo)))
 
 # ─── Load data ────────────────────────────────────────────────────────────
@@ -39,7 +40,7 @@ for k, algo in enumerate(l_algo):
   for i, a in enumerate(l_a):
 
     # Storage
-    S = storage(f'Time scaling/scaling/{algo}/a={a}.h5')      
+    S = storage(f'Time scaling/scaling_eta/{algo}/a={a}.h5')      
     if not S.exists(): continue
 
     # Load data
