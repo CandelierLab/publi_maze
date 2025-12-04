@@ -97,7 +97,28 @@ tau = tau_agg/pL/v
 # ═══ Figure ════════════════════════════════════════════════════════════════
 
 fig, ax = plt.subplots(1,1, figsize=(5,5))
-cm = plt.cm.inferno
+
+# ─── Colormap ──────────────────────────────────
+
+cdict = {'red':   [[0.0,  0.0, 0.0],
+                   [0.10, 0.0, 0.0],
+                   [0.15, 0.0, 0.0],
+                   [0.75, 1.0, 1.0],
+                   [1.0,  1.0, 1.0]],
+         'green': [[0.0,  1.0, 1.0],
+                   [0.10, 0.8, 0.8],
+                   [0.15, 0.2, 0.2],
+                   [0.40, 0.0, 0.0],
+                   [0.90, 1.0, 1.0],
+                   [1.0,  1.0, 1.0]],
+         'blue':  [[0.0,  1.0, 1.0],
+                   [0.10, 1.0, 1.0],
+                   [0.15, 0.8, 0.8],
+                   [0.75, 0.0, 0.0],
+                   [1.0,  1.0, 1.0]]}
+
+cm = LinearSegmentedColormap('testCmap', segmentdata=cdict, N=256)
+# cm = plt.cm.inferno
 
 X, Y = np.meshgrid(l_d, l_eta)
 
@@ -138,7 +159,7 @@ X, Y = np.meshgrid(l_d, l_eta)
 # ax = axes[1,0]
 
 # c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=0, vmax=15, rasterized=True)
-c = ax.pcolormesh(X, Y, tau, vmin=400, vmax=800, cmap = cm, rasterized=True)
+c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=2.5, vmax=5, rasterized=True)
 fig.colorbar(c, ax=ax)
 
 ax.set_xscale('log')
