@@ -24,6 +24,7 @@ l_d = np.geomspace(0.1, 100, 50)
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 lmbd = round(1.612*a**1.044)
+print(f'a={a}, lambda={lmbd}, dmin={lmbd/a**2}')
 
 def N2x0(N, eta):
   x = np.real(eta*lambertw(np.exp((N+1)/eta)/eta)-1)
