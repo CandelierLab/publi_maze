@@ -22,7 +22,7 @@ from storage import storage
 
 # ─── Maze
 
-a = 5
+a = 20
 
 # algo = 'AldousBroder'
 # algo = 'BacktrackingGenerator'
@@ -82,8 +82,15 @@ cm = LinearSegmentedColormap('testCmap', segmentdata=cdict, N=256)
 
 X, Y = np.meshgrid(l_dst, l_eta)
 
-c = ax.pcolormesh(X, Y, np.log10(f_tau), cmap=cm, vmin=0.8, vmax=4, rasterized=True)
+c = ax.pcolormesh(X, Y, np.log10(f_tau), cmap=cm, vmin=2.5, vmax=5, rasterized=True)
 fig.colorbar(c, ax=ax)
+
+# ─── critical density
+
+lmbd = round(1.612*a**1.044)
+dc = l_eta/a**2*(1/(l_eta + lmbd) + np.log(1+l_eta/(l_eta + lmbd)))
+
+ax.plot(dc, l_eta, '--', color='k')
 
 # ─── Plot settings
 
