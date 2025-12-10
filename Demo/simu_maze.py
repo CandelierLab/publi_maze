@@ -24,9 +24,9 @@ import Animation.maze
 multi = 1
 # Maze
 
-a = 50
-density = 20
-eta = 500
+a = 10
+density = 5
+eta = 1
 
 seed = 0
 

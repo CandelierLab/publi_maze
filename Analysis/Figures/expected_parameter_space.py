@@ -18,12 +18,17 @@ from matplotlib.colors import LinearSegmentedColormap
 
 a = 20
 
-l_eta = np.geomspace(1, 1000, 50)
-l_d = np.geomspace(0.1, 100, 50)
+l_eta = np.geomspace(1, 10000, 50)
+l_d = np.geomspace(0.01, 1000, 50)
 
-# ═══ Computation ══════════════════════════════════════════════════════════
+niter = 5000
+
+# ──────────────────────────────────────────────────────────────────────────
 
 lmbd = round(1.612*a**1.044)
+
+# ═══ Resolution time ══════════════════════════════════════════════════════
+
 print(f'a={a}, lambda={lmbd}, dmin={lmbd/a**2}')
 
 def N2x0(N, eta):
@@ -89,85 +94,75 @@ for i, eta in enumerate(l_eta):
 pL = 1-pL
 pL[pL<1e-10] = 1e-10
 
-# ─── tau ────────────────────────────────────────────────────────────────────
+# ═══ Swarm length limit ═══════════════════════════════════════════════════
 
-print(tau_agg[0,0], np.log10(tau_agg[0,0]))
+N = np.zeros(l_eta.size)
+
+for i, eta in enumerate(l_eta):
+
+  n0 = eta/(eta+lmbd)
+
+  nk = eta/(np.arange(niter+1) + eta/n0)
+
+  Nk = 0
+  dk = 1
+
+  for k in range(niter):
+   
+    Nk += nk[k]
+    bk = (nk[k]/(nk[k] + eta))**nk[k] * (eta/(nk[k+1] + eta))**nk[k+1]
+
+    N[i] += Nk*bk*dk
+    
+    dk *= (1-bk)
+
+d_c_ll = N/a**2
+
+# ═══ Fixing limit ═════════════════════════════════════════════════════════
+
+d_c_fx = lmbd/a**2
+
+# ─── tau ────────────────────────────────────────────────────────────────────
 
 tau = tau_agg/pL/v
 
 # ═══ Figure ════════════════════════════════════════════════════════════════
 
 fig, ax = plt.subplots(1,1, figsize=(5,5))
-
-# ─── Colormap ──────────────────────────────────
-
-# cdict = {'red':   [[0.0,  0.0, 0.0],
-#                    [0.10, 0.0, 0.0],
-#                    [0.15, 0.0, 0.0],
-#                    [0.75, 1.0, 1.0],
-#                    [1.0,  1.0, 1.0]],
-#          'green': [[0.0,  1.0, 1.0],
-#                    [0.10, 0.8, 0.8],
-#                    [0.15, 0.2, 0.2],
-#                    [0.40, 0.0, 0.0],
-#                    [0.90, 1.0, 1.0],
-#                    [1.0,  1.0, 1.0]],
-#          'blue':  [[0.0,  1.0, 1.0],
-#                    [0.10, 1.0, 1.0],
-#                    [0.15, 0.8, 0.8],
-#                    [0.75, 0.0, 0.0],
-#                    [1.0,  1.0, 1.0]]}
-
-# cm = LinearSegmentedColormap('testCmap', segmentdata=cdict, N=256)
 cm = plt.cm.inferno
 
 X, Y = np.meshgrid(l_d, l_eta)
-
-# ─── Expected swarm length ─────────────────────
-
-# ax = axes[0,0]
-
-# c = ax.pcolormesh(X, Y, L, cmap = cm, vmin=0, vmax=5, rasterized=True)
-# # c = ax.pcolormesh(X, Y, np.log10(L), cmap = cm, rasterized=True)
-# fig.colorbar(c, ax=ax)
-
-# ax.set_xscale('log')
-# ax.set_yscale('log'),
-
-# ax.set_xlabel('$d$')
-# ax.set_ylabel('$\eta$')
-
-# ax.set_box_aspect(1)
-
-# ─── Swarm speed ───────────────────────────────
-
-# ax = axes[0,1]
-
-# c = ax.pcolormesh(X, Y, np.log10(v), cmap = cm, rasterized=True)
-# # c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, rasterized=True)
-# fig.colorbar(c, ax=ax)
-
-# ax.set_xscale('log')
-# ax.set_yscale('log'),
-
-# ax.set_xlabel('$d$')
-# ax.set_ylabel('$\eta$')
-
-# ax.set_box_aspect(1)
 
 # ─── Resolution time ───────────────────────────
 
 # ax = axes[1,0]
 
-# c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=0, vmax=15, rasterized=True)
-c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=2.5, vmax=5, rasterized=True)
+# c = ax.pcolormesh(X, Y, tau<2.5*(a**2-lmbd), cmap = cm, vmin=0, vmax=1, rasterized=True)
+c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=0, vmax=10, rasterized=True)
+# c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=2.5, vmax=5, rasterized=True)
+
+plt.contour(X, Y, tau, levels=[2.5*(a**2-lmbd)], colors='w', linestyles=':')
 fig.colorbar(c, ax=ax)
+
+# ─── Swarm length limit ────────────────────────
+
+ax.plot(d_c_ll, l_eta, '--', color='k')
+
+# ─── Unfixing limit ────────────────────────────
+
+ax.axvline(d_c_fx, linestyle=':', color='k')
+
+# ─── Plot parameters ───────────────────────────
+
+ax.set_xlabel('$d$')
+ax.set_ylabel('$\eta$')
 
 ax.set_xscale('log')
 ax.set_yscale('log'),
 
-ax.set_xlabel('$d$')
-ax.set_ylabel('$\eta$')
+ax.set_xlim(min(l_d), max(l_d))
+ax.set_ylim(min(l_eta), max(l_eta))
+
 
 ax.set_box_aspect(1)
 
