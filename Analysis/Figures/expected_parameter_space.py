@@ -45,7 +45,7 @@ def N2x0(N, eta):
 pL = np.zeros((l_eta.size, l_d.size))  
 L = np.zeros((l_eta.size, l_d.size))
 v = np.zeros((l_eta.size, l_d.size))
-tau_agg = np.zeros((l_eta.size, l_d.size))
+N_explo = np.zeros((l_eta.size, l_d.size))
 
 for i, eta in enumerate(l_eta):
 
@@ -58,19 +58,8 @@ for i, eta in enumerate(l_eta):
     # Head speed
     v[i,j] = x0/(x0+eta)
 
-    # Aggregation time
-
-    # S = 0
-    # K = np.log2(a**2)
-    # for k in range(int(K/2)):
-    #   xk = N2x0(l_d[j]*2**k, eta)
-    #   vk = xk/(xk+eta)
-    #   S += 2**k/vk
-
-    tau_agg[i,j] = 2*(a**2 - lmbd) # + K*eta - 1
-    # tau_agg[i,j] = a**2 # + K*eta - 1
-
-    # tau_agg[i,j] = S
+    # Exploration time
+    N_explo[i,j] = 2*(a**2 - lmbd)
 
     # Probability of sufficient length
     P = 1
@@ -83,18 +72,13 @@ for i, eta in enumerate(l_eta):
       pL[i,j] += bk*P
       P *= 1-bk
 
-    # for k in range(5000):
-
-    #   xk = eta/(k + eta/x0)
-    #   bk = (xk/(xk+eta))**xk
-    #   L[i,j] += (k+1)*bk*P
-    #   P *= 1-bk
-
 # Proba to have at least a length of lambda
 pL = 1-pL
 pL[pL<1e-10] = 1e-10
 
 # ═══ Swarm length limit ═══════════════════════════════════════════════════
+
+# ─── In density
 
 N = np.zeros(l_eta.size)
 
@@ -118,13 +102,22 @@ for i, eta in enumerate(l_eta):
 
 d_c_ll = N/a**2
 
+# ─── In eta
+
+eta_c = np.zeros(l_d.size)
+
+for i, d in enumerate(l_d):
+
+  n0 = d*a**2
+  eta_c[i] = lmbd*n0/(n0 - 1)
+
 # ═══ Fixing limit ═════════════════════════════════════════════════════════
 
 d_c_fx = lmbd/a**2
 
 # ─── tau ────────────────────────────────────────────────────────────────────
 
-tau = tau_agg/pL/v
+tau = N_explo/pL/v
 
 # ═══ Figure ════════════════════════════════════════════════════════════════
 
@@ -135,11 +128,7 @@ X, Y = np.meshgrid(l_d, l_eta)
 
 # ─── Resolution time ───────────────────────────
 
-# ax = axes[1,0]
-
-# c = ax.pcolormesh(X, Y, tau<2.5*(a**2-lmbd), cmap = cm, vmin=0, vmax=1, rasterized=True)
 c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=0, vmax=10, rasterized=True)
-# c = ax.pcolormesh(X, Y, np.log10(tau), cmap = cm, vmin=2.5, vmax=5, rasterized=True)
 
 plt.contour(X, Y, tau, levels=[2.5*(a**2-lmbd)], colors='w', linestyles=':')
 fig.colorbar(c, ax=ax)
@@ -151,6 +140,10 @@ ax.plot(d_c_ll, l_eta, '--', color='k')
 # ─── Unfixing limit ────────────────────────────
 
 ax.axvline(d_c_fx, linestyle=':', color='k')
+
+# ─── Low eta limit ─────────────────────────────
+
+ax.plot(l_d, eta_c, '-.', color='k')
 
 # ─── Plot parameters ───────────────────────────
 

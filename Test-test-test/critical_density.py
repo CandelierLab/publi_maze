@@ -50,7 +50,7 @@ for i, eta in enumerate(l_eta):
 dc = N/S
 
 # Approximation
-dc_ = l_eta/S*(1/(l_eta + lmbd) + np.log(1+l_eta/(l_eta + lmbd)))
+dc_ = l_eta/S*(1/(l_eta - lmbd) + np.log(1+l_eta/(l_eta - lmbd)))
 
 fig, ax = plt.subplots(1,1)
 
