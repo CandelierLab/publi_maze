@@ -76,7 +76,7 @@ cdict = {'red':   [[0.0,  0.0, 0.0],
                    [0.75, 0.0, 0.0],
                    [1.0,  1.0, 1.0]]}
 
-cm = LinearSegmentedColormap('testCmap', segmentdata=cdict, N=256)
+cm = LinearSegmentedColormap('colormap', segmentdata=cdict, N=256)
 
 # ─── Plot ──────────────────────────────────────
 

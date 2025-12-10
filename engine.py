@@ -146,10 +146,21 @@ class Engine:
 
     # ─── Colormap
 
+    vmin = 0
+    vmax = 1
+
     if self.graph.solution is None:
-      self.animation.colormap.range = [0, max(1, 3*self.agents.N/self.graph.number_of_positions)]
+      vmax = max(1, 3*self.agents.N/self.graph.number_of_positions)
     else:
-      self.animation.colormap.range = [0, max(1, np.round(self.agents.N/len(self.graph.solution[0])))]
+      if self.animation.log_densities:
+
+        vmin = -1
+        vmax = 1 + np.ceil(np.log10(self.agents.N/len(self.graph.solution[0])))
+
+      else:
+        vmax = max(1, np.round(self.agents.N/len(self.graph.solution[0])))
+
+    self.animation.colormap.range = [vmin, vmax]
 
   # ────────────────────────────────────────────────────────────────────────
   def run(self):

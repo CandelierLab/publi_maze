@@ -26,7 +26,7 @@ class base(anim.plane.canva):
                solution_color = 'magenta',
                edge_thickness = None,
                edge_color = 'cyan',
-               id_color = 'gray'):
+               id_color = 'gray', **kwargs):
     '''
     Arguments
     * window    Window
@@ -271,6 +271,8 @@ class density(base):
 
     # Options
     self.show_densities = kwargs['show_densities'] if 'show_densities' in kwargs else False
+    self.colorbar = kwargs['colorbar'] if 'colorbar' in kwargs else True
+    self.log_densities = kwargs['log_densities'] if 'log_densities' in kwargs else False
     
   # ────────────────────────────────────────────────────────────────────────
   def initialize(self):
@@ -285,14 +287,15 @@ class density(base):
     # Set boundaries size
     self.window.information.canva.boundaries = [[0,1],[0,3]]
 
-    self.window.information.canva.item.cbar = anim.plane.colorbar(
-      position = [0.8, 1],
-      dimension = [0.2, 2],
-      colormap = self.colormap,
-      ticks_number = 2,
-      ticks_fontsize = 0.1,
-      ticks_color = '#AAA'
-    )
+    if self.colorbar:
+      self.window.information.canva.item.cbar = anim.plane.colorbar(
+        position = [0.8, 1],
+        dimension = [0.2, 2],
+        colormap = self.colormap,
+        ticks_number = 2,
+        ticks_fontsize = 0.1,
+        ticks_color = '#AAA'
+      )
 
     # ─── Squares ────────────────────────────────
 
@@ -303,7 +306,10 @@ class density(base):
       y = k // self.maze.X
 
       # Color
-      C = self.colormap.qcolor(self.engine.density(k, universe=self.universe))
+      if self.log_densities:
+        C = self.colormap.qcolor(np.log10(self.engine.density(k, universe=self.universe)))
+      else:
+        C = self.colormap.qcolor(self.engine.density(k, universe=self.universe))
 
       # Square
       self.item[f'cell_{k}'] = anim.plane.rectangle(
@@ -350,7 +356,11 @@ class density(base):
         self.item[f'density_{k}'].string = str(d)
 
       # Color
-      C = self.colormap.qcolor(d)
+      if self.log_densities:
+        C = self.colormap.qcolor(np.log10(d))
+      else:
+        C = self.colormap.qcolor(d)
+
 
       # Square
       self.item[f'cell_{k}'].color = C
