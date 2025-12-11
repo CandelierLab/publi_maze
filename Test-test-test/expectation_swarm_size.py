@@ -17,6 +17,9 @@ plt.style.use('dark_background')
 l_eta = np.geomspace(1,1000,50)
 # l_eta = np.array([100])
 
+a = 20
+lmbd = round(1.612*a**1.044)
+
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 l_x0 = np.geomspace(0.1, 100, 50)
@@ -73,8 +76,11 @@ for i, eta in enumerate(l_eta):
 X, Y = np.meshgrid(l_x0, l_eta)
 
 # c = ax.pcolormesh(X, Y, v, vmin=0, vmax=1, rasterized=True)
-c = ax.pcolormesh(X, Y, np.log(L), rasterized=True)
+c = ax.pcolormesh(X, Y, np.log10(L), rasterized=True)
 fig.colorbar(c, ax=ax)
+
+plt.contour(X, Y, L, levels=[4], colors='w', linestyles=':')
+
 
 ax.set_xscale('log')
 ax.set_yscale('log')

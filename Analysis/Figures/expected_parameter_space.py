@@ -74,7 +74,7 @@ for i, eta in enumerate(l_eta):
 
 # Proba to have at least a length of lambda
 pL = 1-pL
-pL[pL<1e-10] = 1e-10
+pL[pL<1e-20] = 1e-20
 
 # ═══ Swarm length limit ═══════════════════════════════════════════════════
 
@@ -95,9 +95,7 @@ for i, eta in enumerate(l_eta):
    
     Nk += nk[k]
     bk = (nk[k]/(nk[k] + eta))**nk[k] * (eta/(nk[k+1] + eta))**nk[k+1]
-
-    N[i] += Nk*bk*dk
-    
+    N[i] += Nk*bk*dk    
     dk *= (1-bk)
 
 d_c_ll = N/a**2
@@ -143,7 +141,7 @@ ax.axvline(d_c_fx, linestyle=':', color='k')
 
 # ─── Low eta limit ─────────────────────────────
 
-ax.plot(l_d, eta_c, '-.', color='k')
+# ax.plot(l_d, eta_c, '-.', color='k')
 
 # ─── Plot parameters ───────────────────────────
 

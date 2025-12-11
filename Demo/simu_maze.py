@@ -24,12 +24,12 @@ import Animation.maze
 multi = 1
 # Maze
 
-a = 10
+a = 20
 density = 5
-eta = 1
+eta = 50
 
 seed = 0
-
+ 
 # algo = 'AldousBroder'
 # algo = 'BacktrackingGenerator'
 # algo = 'BinaryTree'
