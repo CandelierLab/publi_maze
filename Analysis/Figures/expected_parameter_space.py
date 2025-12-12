@@ -98,16 +98,7 @@ for i, eta in enumerate(l_eta):
     N[i] += Nk*bk*dk    
     dk *= (1-bk)
 
-d_c_ll = N/a**2
-
-# ─── In eta
-
-eta_c = np.zeros(l_d.size)
-
-for i, d in enumerate(l_d):
-
-  n0 = d*a**2
-  eta_c[i] = lmbd*n0/(n0 - 1)
+d_frag = N/a**2
 
 # ═══ Fixing limit ═════════════════════════════════════════════════════════
 
@@ -133,15 +124,11 @@ fig.colorbar(c, ax=ax)
 
 # ─── Swarm length limit ────────────────────────
 
-ax.plot(d_c_ll, l_eta, '--', color='k')
+ax.plot(d_frag, l_eta, ':', color='k')
 
 # ─── Unfixing limit ────────────────────────────
 
-ax.axvline(d_c_fx, linestyle=':', color='k')
-
-# ─── Low eta limit ─────────────────────────────
-
-# ax.plot(l_d, eta_c, '-.', color='k')
+ax.axvline(d_c_fx, linestyle='--', color='k')
 
 # ─── Plot parameters ───────────────────────────
 

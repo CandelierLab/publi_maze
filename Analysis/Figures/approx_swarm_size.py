@@ -52,10 +52,9 @@ for i, eta in enumerate(l_eta):
 
   x = l_x0
   y = N[i,:]
-  # y = (y-y[0])/(y[-1]-y[0])
 
   ax.plot(x, y, '.', color=cm[i], label=f'$\eta={eta}$')
-  ax.plot(x, x + eta*np.log(x) , '-', color=cm[i])
+  ax.plot(x, x + eta*np.log(x+1) , '-', color=cm[i])
 
 ax.set_xscale('log')
 ax.set_yscale('log')
