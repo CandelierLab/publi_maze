@@ -45,26 +45,23 @@ def N2x0(N, eta):
 pL = np.zeros((l_eta.size, l_d.size))  
 L = np.zeros((l_eta.size, l_d.size))
 v = np.zeros((l_eta.size, l_d.size))
-N_explo = np.zeros((l_eta.size, l_d.size))
+N_explo = 2*(a**2 - lmbd)
 
 for i, eta in enumerate(l_eta):
 
-  l_x0 = N2x0(l_d*lmbd,eta)
+  l_n0 = N2x0(l_d*lmbd,eta)
   
   # ─── Probability of sufficient length + speed
 
-  for j, x0 in enumerate(l_x0):
+  for j, n0 in enumerate(l_n0):
 
     # Head speed
-    v[i,j] = x0/(x0+eta)
-
-    # Exploration time
-    N_explo[i,j] = 2*(a**2 - lmbd)
+    v[i,j] = n0/(n0+eta)
 
     # Probability of sufficient length
     P = 1
 
-    x = eta/(np.arange(lmbd+1) + eta/x0)
+    x = eta/(np.arange(lmbd+1) + eta/n0)
 
     for k in range(lmbd):
 
