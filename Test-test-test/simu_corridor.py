@@ -22,17 +22,17 @@ import Animation.maze
 multi = 1
 
 # Maze
-a = 37
+a = 100
 
 # Agents
-density = 5
+density = 1
 eta = 10
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 # ─── Maze ─────────────────────────────────────────────────────────────────
 
-M = corridor(size=a, periodic=True)
+M = corridor(size=a, periodic=False)
 
 # ─── Engine ───────────────────────────────────────────────────────────────
 
@@ -45,12 +45,14 @@ E.add_agents(N, eta)
 
 # ─── Display ──────────────────────────────────────────────────────────────
 
-E.setup_display(Animation.maze.density, maze=M)
+E.setup_display(Animation.maze.density, maze=M, log_densities=True, colorbar=True)
 
-E.animation.colormap = anim.colormap(name='inferno', ncolors=density*5+1)
-E.animation.colormap.cmap.colors[0,0:3] = 1.0
-print(E.animation.colormap.cmap.colors)
-E.animation.colormap.range = [0,density*5]
+# E.setup_display(Animation.maze.density, maze=M)
+
+# E.animation.colormap = anim.colormap(name='inferno', ncolors=density*5+1)
+# E.animation.colormap.cmap.colors[0,0:3] = 1.0
+# print(E.animation.colormap.cmap.colors)
+# E.animation.colormap.range = [0,density*5]
 
 # Information
 E.animation.window.information.show_time = False
