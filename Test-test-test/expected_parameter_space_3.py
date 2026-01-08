@@ -51,7 +51,7 @@ L = np.zeros((l_eta.size, l_d.size))
 tau = np.zeros((l_eta.size, l_d.size))
 K = np.zeros((l_eta.size, l_d.size))
 
-N_explo = 2*(a**2 - lmbd)
+N_explo = (a**2 - lmbd)
 
 # l_n0 = 100*np.ones(50)
 # l_n0 = l_d*lmbd
@@ -60,43 +60,61 @@ for i, eta in enumerate(l_eta):
 
   for j, d in enumerate(l_d):
 
-    N = d*a**2
+    for k in range(100):
 
+      tau_m = 2**k
+      n0 = d*2**k
 
-    # Probability of insufficient length
-    P = 1
-    p_il = 0
-    x = eta/(np.arange(lmbd+1) + eta/N)
-    
-    for l in range(lmbd):
+      # Head speed
+      v = n0/(n0+eta)
 
-      bk = ((x[l]/(x[l]+eta))**x[l])*((eta/(x[l+1]+eta))**x[l+1])
-      p_il += bk*P
-      P *= 1-bk
+      # Probability of insufficient length
+      P = 1
+      p_il = 0
+      x = eta/(np.arange(lmbd+1) + eta/n0)
+      
+      for l in range(lmbd):
 
-    # ─── Probability of unfixing
+        bk = ((x[l]/(x[l]+eta))**x[l])*((eta/(x[l+1]+eta))**x[l+1])
+        p_il += bk*P
+        P *= 1-bk
 
-    # n = d*a**2/lmbd
-    # p = n/(n+eta)
-    # g = (p*(1-p))**n
+      # ─── Probability of unfixing
 
-    # p_u = lmbd*rho_Prims*g/2
-    # tau_u = 1/p_u
+      # n = d*a**2/lmbd
+      # p = n/(n+eta)
+      # g = (p*(1-p))**n
 
-    # ─── Probability of sufficient length + speed
+      # p_u = lmbd*rho_Prims*g/2
+      # tau_u = 1/p_u
 
-    p_l = (1-p_il)
-    if p_l<1e-20: p_l = 1e-20
+      # ─── Probability of sufficient length + speed
 
-    # Head speed
-    n0 = N
-    v = n0/(n0+eta)
+      p_l = (1-p_il)
+      if p_l<1e-20: p_l = 1e-20
 
-    # ─── Solving time
+      tau_l = N_explo/v/p_l
 
-    tau_l = N_explo/v/p_l
+      # print('k', k, 'n0', n0, 'tau_m', tau_m, 'tau_l', tau_l, 'p_l', p_l)
 
-    tau[i,j] = tau_l
+      if tau_l>tau_m: # or tau_u<tau_m:
+        # Iterate
+        tau[i,j] += tau_m
+        # pass
+
+      else:
+        # Keep resolution time
+        K[i,j] += k
+        tau[i,j] += tau_l
+        break
+        
+    # sys.exit()
+
+# sys.exit()
+
+# Proba to have at least a length of lambda
+# pL = 1-pL
+# pL[pL<1e-20] = 1e-20
 
 # ═══ Swarm length limit ═══════════════════════════════════════════════════
 
