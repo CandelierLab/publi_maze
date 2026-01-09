@@ -29,18 +29,27 @@ zeta_r = maze.zeta_random(algo, a)
 
 # ──────────────────────────────────────────────────────────────────────────
 
+lmbd = round(1.612*a**1.044)
+
 # Base tag
-base_tag = 'Parameter space' + os.sep + algo + os.sep + f'a={a}' + os.sep
+base_tag = 'Parameter space' + os.sep
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 # ─── Load data ─────────────────────────────────
 
-F = storage(base_tag + 'fields')
+F = storage(base_tag + algo + os.sep + f'a={a}' + os.sep + 'fields')
 
 l_dst = F['dst']
 l_eta = F['eta']
 f_tau = F['tau']
+
+# F = storage(base_tag + 'expected' + os.sep + f'a={a} n_bins=200')
+
+# th_N = F['N']
+# th_eta = F['eta']
+# th_v = F['v']
+# th_L = F['L']
 
 # ═══ Figure ════════════════════════════════════════════════════════
 
@@ -69,10 +78,23 @@ cm = LinearSegmentedColormap('testCmap', segmentdata=cdict, N=256)
 
 # ─── Plot ──────────────────────────────────────
 
+# ─── Resolution time map
+
 X, Y = np.meshgrid(l_dst, l_eta)
 
 c = ax.pcolormesh(X, Y, np.log10(f_tau), cmap=cm, vmin=2.5, rasterized=True)
 fig.colorbar(c, ax=ax)
+
+# ─── Model guidelines
+
+# # # th_d = th_N/a**2
+# # # th_X, th_Y = np.meshgrid(th_d, th_eta)
+
+# # # # Expected length
+# # # plt.contour(th_X, th_Y, th_L, levels=[lmbd], colors='k', linestyles='--')
+
+# # # # Speed contour
+# # # plt.contour(th_X, th_Y, th_v, levels=[0.5], colors='k', linestyles=':')
 
 # ─── Plot settings
 
