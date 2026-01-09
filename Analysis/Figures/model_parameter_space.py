@@ -21,6 +21,7 @@ plt.style.use('dark_background')
 # ─── Maze
 
 a = 20
+n_bins = 10
 
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -33,7 +34,7 @@ base_tag = 'Parameter space' + os.sep + 'expected' + os.sep
 
 # ─── Load data ─────────────────────────────────
 
-F = storage(base_tag + f'a={a}')
+F = storage(base_tag + f'a={a} n_bins={n_bins}')
 
 l_N = F['N']
 l_eta = F['eta']

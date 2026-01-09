@@ -20,10 +20,10 @@ plt.style.use('dark_background')
 a = 20
 d_deadend_loop = 10
 
+n_bins = 100
 
-
-l_eta = np.geomspace(1, 1000, 10)
-l_N = np.geomspace(10, 10000, 10)
+l_eta = np.geomspace(1, 1000, n_bins)
+l_N = np.geomspace(10, 10000, n_bins)
 
 # l_N = np.array([10])
 # l_eta = np.array([1000])
@@ -41,7 +41,7 @@ Lmbd = lmbd + d_deadend_loop
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 # Storage
-out = storage(base_tag + f'a={a}')
+out = storage(base_tag + f'a={a} n_bins={n_bins}')
 
 out['N'] = l_N
 out['eta'] = l_eta
