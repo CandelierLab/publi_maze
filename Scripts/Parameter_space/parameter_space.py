@@ -40,10 +40,10 @@ ndpd = 4
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
-print(l_dst)
+# print(l_dst)
 
-import sys
-sys.exit()
+# import sys
+# sys.exit()
 
 # ─── Simulation
 

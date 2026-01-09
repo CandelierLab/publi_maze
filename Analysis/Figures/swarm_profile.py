@@ -56,14 +56,15 @@ ax[0].set_ylabel('$n_x^t$')
 # # # Y[Y<0] = 0
 # # # c = ax[1].pcolormesh(X, Y, np.log10(n), cmap =  plt.cm.inferno, vmin=0, vmax=np.log10(N), rasterized=True)
 
-c = ax[1].pcolormesh(np.log10(n), cmap =  plt.cm.magma, vmin=0, vmax=np.log10(N), rasterized=True)
+ax[1].yaxis.set_inverted(True)
+c = ax[1].pcolormesh(np.log10(n).T, cmap =  plt.cm.magma, vmin=0, vmax=np.log10(N), rasterized=True)
 fig.colorbar(c, ax=ax[1])
 
 # ax[1].set_xscale('log')
 # ax[1].set_yscale('log')
 
-ax[1].set_xlabel('$t$')
-ax[1].set_ylabel('$x$')
+ax[1].set_xlabel('$x$')
+ax[1].set_ylabel('$t$')
 
 # x = np.arange(Tmax)
 # y = 5*x**0.5
