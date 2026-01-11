@@ -15,7 +15,7 @@ class base(anim.plane.canva):
   '''
 
   # ────────────────────────────────────────────────────────────────────────
-  def __init__(self, window, maze, universe=0,
+  def __init__(self, window:anim.window, maze, universe=0,
                disp_solution = False, 
                disp_graph = False, 
                disp_id = False, 
