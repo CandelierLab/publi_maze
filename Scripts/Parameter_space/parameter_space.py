@@ -20,7 +20,7 @@ from storage import storage
 
 # ─── Maze
 
-a = 30
+a = 20
 
 # algo = 'AldousBroder'
 # algo = 'BacktrackingGenerator'
@@ -36,11 +36,18 @@ algo = 'Prims'
 # ─── Agents
 
 # Parameters
-ndpd = 4
+ndpd = 16
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
-# print(l_dst)
+# print('dst', l_dst)
+# print('eta', l_eta)
+
+# l_dst = np.array([l_dst[2]])
+# l_eta = np.array([l_eta[2]])
+
+# print('dst', l_dst)
+# print('eta', l_eta)
 
 # import sys
 # sys.exit()
@@ -48,14 +55,14 @@ l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 # ─── Simulation
 
 # Runs
-n_mazes = 10
-n_runs = 100
+n_runs = 10
+n_multi = 100
 trigger = 0.9
 max_steps = int(1e5)
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
-for run in range(n_mazes):
+for run in range(n_runs):
 
   for dst in l_dst:
 
@@ -82,8 +89,9 @@ for run in range(n_mazes):
 
       # ─── Engine ───────────────────────────────────────────────────────────────
 
-      E = Engine(M.graph, storage=strg, multi=n_runs)
+      E = Engine(M.graph, storage=strg, multi=n_multi)
       E.storage.save_success = True
+      E.storage.save_energy = True
       E.max_steps = max_steps
 
       # ─── Agents ───────────────────────────────────────────────────────────────

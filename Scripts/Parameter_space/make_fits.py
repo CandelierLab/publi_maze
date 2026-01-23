@@ -23,7 +23,7 @@ from storage import storage
 
 # ─── Maze
 
-a = 10
+a = 20
 
 # algo = 'AldousBroder'
 # algo = 'BacktrackingGenerator'
@@ -66,6 +66,7 @@ f_solved = np.zeros((n_eta, n_dst))
 f_z0 = np.zeros((n_eta, n_dst))
 f_Z = np.zeros((n_eta, n_dst))
 f_tau = np.zeros((n_eta, n_dst))
+f_energy = np.zeros((n_eta, n_dst))
 
 for i, eta in enumerate(l_eta):
 
@@ -87,10 +88,14 @@ for i, eta in enumerate(l_eta):
     l_Z = np.empty(0)
     l_k = np.empty(0)
     l_tau = np.empty(0)
+    l_energy = np.empty(0)
 
     for fname in l_dir:
 
       S = storage(p_dir + os.sep + fname)
+
+      # import sys
+      # sys.exit()
 
       z0, Z, k, tau = fit_many(S['success'])
 
@@ -99,12 +104,17 @@ for i, eta in enumerate(l_eta):
       l_k = np.concatenate((l_k, k))
       l_tau = np.concatenate((l_tau, tau))
 
+      tau = np.round(tau).astype(int)
+      tau[tau>S['energy'].shape[1]-1] = S['energy'].shape[1]-1
+      l_energy = np.concatenate((l_energy, S['energy'][:, tau].flatten()))
+
     # ─── Compute fields
 
     f_solved[i,j] = 1 - np.count_nonzero(np.isnan(l_tau))/l_tau.size
     f_z0[i,j] = np.nanmean(l_z0)
     f_Z[i,j] = np.nanmean(l_Z)
     f_tau[i,j] = np.nanmean(l_tau)
+    f_energy[i,j] = np.nanmean(l_energy)
 
     print(f' {time.perf_counter()-tref:.02f} sec')
 
@@ -112,5 +122,6 @@ out['solved'] = f_solved
 out['z0'] = f_z0
 out['Z'] = f_Z
 out['tau'] = f_tau
+out['energy'] = f_energy
 
     

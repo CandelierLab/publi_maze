@@ -10,7 +10,6 @@ os.system('clear')
 # Standard packages
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import LinearSegmentedColormap
 
 # Maze
 from maze import maze
@@ -52,60 +51,60 @@ F = storage(base_tag + 'fields')
 l_dst = F['dst']
 l_eta = F['eta']
 f_tau = F['tau']
+f_energy = F['energy']
 
 # ═══ Figure ════════════════════════════════════════════════════════
 
-fig, ax = plt.subplots(1,1, figsize=(7,7))
+plt.style.use('dark_background')
+fig, ax = plt.subplots(1,2, figsize=(15,7))
 
-# ─── Colormap ──────────────────────────────────
-
-cdict = {'red':   [[0.0,  0.0, 0.0],
-                   [0.10, 0.0, 0.0],
-                   [0.15, 0.0, 0.0],
-                   [0.75, 1.0, 1.0],
-                   [1.0,  1.0, 1.0]],
-         'green': [[0.0,  1.0, 1.0],
-                   [0.10, 0.8, 0.8],
-                   [0.15, 0.2, 0.2],
-                   [0.40, 0.0, 0.0],
-                   [0.90, 1.0, 1.0],
-                   [1.0,  1.0, 1.0]],
-         'blue':  [[0.0,  1.0, 1.0],
-                   [0.10, 1.0, 1.0],
-                   [0.15, 0.8, 0.8],
-                   [0.75, 0.0, 0.0],
-                   [1.0,  1.0, 1.0]]}
-
-cm = LinearSegmentedColormap('colormap', segmentdata=cdict, N=256)
-
-# ─── Plot ──────────────────────────────────────
+# Colormap
+cm = plt.cm.inferno
 
 X, Y = np.meshgrid(l_dst, l_eta)
 
-c = ax.pcolormesh(X, Y, np.log10(f_tau), cmap=cm, vmin=2.5, vmax=5, rasterized=True)
-fig.colorbar(c, ax=ax)
+# ─── Resolution time ──────────────────────────────────────────────────────
 
-# ─── critical density
-
-lmbd = round(1.612*a**1.044)
-dc = l_eta/a**2*(1/(l_eta + lmbd) + np.log(1+l_eta/(l_eta + lmbd)))
-
-ax.plot(dc, l_eta, '--', color='k')
+c = ax[0].pcolormesh(X, Y, np.log10(f_tau), cmap=cm, vmin=2.5, vmax=5, rasterized=True)
+fig.colorbar(c, ax=ax[0])
 
 # ─── Plot settings
 
 # Labels
-ax.set_xlabel('density $d$')
-ax.set_ylabel('kinetic parameter $\eta$')
+ax[0].set_title('resolution time')
+ax[0].set_xlabel('density $d$')
+ax[0].set_ylabel('kinetic parameter $\eta$')
 
 # Axes limits
-ax.set_xlim(np.min(l_dst), np.max(l_dst))
-ax.set_ylim(np.min(l_eta), np.max(l_eta))
+ax[0].set_xlim(np.min(l_dst), np.max(l_dst))
+ax[0].set_ylim(np.min(l_eta), np.max(l_eta))
 
 # Log scale
-ax.set_xscale('log')
-ax.set_yscale('log')
+ax[0].set_xscale('log')
+ax[0].set_yscale('log')
 
-ax.set_box_aspect(1)
+ax[0].set_box_aspect(1)
+
+# ─── Energy ───────────────────────────────────────────────────────────────
+
+c = ax[1].pcolormesh(X, Y, np.log10(f_energy/X), cmap=cm, rasterized=True)
+fig.colorbar(c, ax=ax[1])
+
+# ─── Plot settings
+
+# Labels
+ax[1].set_title('energy')
+ax[1].set_xlabel('density $d$')
+ax[1].set_ylabel('kinetic parameter $\eta$')
+
+# Axes limits
+ax[1].set_xlim(np.min(l_dst), np.max(l_dst))
+ax[1].set_ylim(np.min(l_eta), np.max(l_eta))
+
+# Log scale
+ax[1].set_xscale('log')
+ax[1].set_yscale('log')
+
+ax[1].set_box_aspect(1)
 
 plt.show()

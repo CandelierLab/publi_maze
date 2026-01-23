@@ -89,10 +89,14 @@ class Engine:
     # Success ratio
     self.success = None
 
+    # Energy
+    self.energy = None
+
     # ─── Internal storage
 
     self.store_steps = None
     self.store_success = True
+    self.store_energy = True
     self.store_blanks = False
     self.store_densities = False
     self.store_trajectories = False
@@ -105,6 +109,7 @@ class Engine:
 
     # Saving options
     self.save_success = False
+    self.save_energy = False
     self.save_blanks = False
     self.save_trajectories = False
 
@@ -187,6 +192,10 @@ class Engine:
     # Reset success
     if self.store_success:
       self.l_success = [[] for i in range(self.multi)]
+
+    # Reset energy
+    if self.store_energy:
+      self.l_energy = [[] for i in range(self.multi)]
 
     # Reset blanks
     if self.store_blanks:
@@ -373,7 +382,13 @@ class Engine:
             case 'GPU': self.gpu.step()
             case 'CPU': self.cpu.step()
 
-          hf['success'] = self.l_success
+          hf['success'] = np.array(self.l_success, dtype=np.float16)
+
+        # ─── Energy
+
+        if self.storage.save_energy:
+
+          hf['energy'] = np.array(self.l_energy, dtype=np.uint32)
 
         # ─── Blanks
 
@@ -441,5 +456,6 @@ class Engine:
     self._storage.save_maze = False
     self._storage.save_trajectories = False
     self._storage.save_success = False
+    self._storage.save_energy = False
     self._storage.save_blanks = False
 

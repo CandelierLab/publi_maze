@@ -49,6 +49,8 @@ class GPU_engine:
     self.squid_depth = 32
     self.denst_depth = 32
     self.flow_depth = 32
+    self.energy_depth = 32
+
 
     # Formats
     match self.squid_depth:
@@ -62,6 +64,10 @@ class GPU_engine:
     match self.flow_depth:
       case 16: self.flow_format = np.int16
       case 32: self.flow_format = np.int32
+
+    match self.energy_depth:
+      case 16: self.energy_format = np.uint16
+      case 32: self.energy_format = np.uint32
 
     # ─── Constants ─────────────────────────────
 
@@ -173,6 +179,9 @@ class GPU_engine:
     solution = np.insert(solution, 0, solution.size)
     self.h_nsl = np.zeros(self.multi, dtype=self.denst_format)
 
+    # Energy
+    self.h_eng = np.zeros(self.multi, dtype=self.energy_format)
+
     # ─── Device arrays
 
     mf = cl.mem_flags
@@ -194,6 +203,7 @@ class GPU_engine:
     self.d_dns = cl.Buffer(ctx, mf.READ_WRITE, self.h_dns.nbytes)
     self.d_flw = cl.Buffer(ctx, mf.READ_WRITE, self.h_flw.nbytes)
     self.d_nsl = cl.Buffer(ctx, mf.READ_WRITE, self.h_nsl.nbytes)
+    self.d_eng = cl.Buffer(ctx, mf.READ_WRITE, self.h_eng.nbytes)
     self.d_rnd = cl_array.zeros(self.queue, self.multi*self.n_agents, dtype=np.float32)
 
   # ────────────────────────────────────────────────────────────────────────
@@ -236,6 +246,13 @@ class GPU_engine:
       for k in range(self.multi):
         self.engine.l_success[k].append(self.engine.success[k].item())
 
+    # Import energy
+    cl.enqueue_copy(self.queue, self.h_eng, self.d_eng)
+    self.engine.energy = self.h_eng
+    if self.engine.store_energy or (self.engine.storage is not None and self.engine.storage.save_energy):
+      for k in range(self.multi):
+        self.engine.l_energy[k].append(self.h_eng[k].item())
+
     # Import blanks
     if self.engine.store_blanks:
 
@@ -256,7 +273,7 @@ class GPU_engine:
     self.kernel.motion(self.queue, [self.n_agents*self.multi], None,        # Required arguments
                            self.d_nag, self.d_nnd, self.d_dmx, self.d_edg, self.d_eta,  # Constants
                            self.d_dns, self.d_flw,                          # Inputs
-                           self.d_pos, self.d_org,                          # Outputs
+                           self.d_pos, self.d_org, self.d_eng,              # Outputs
                            self.d_rnd.data,                                 # Misc (random values)
                            ).wait()
 

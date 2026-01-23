@@ -50,7 +50,9 @@ tau = (a**2-lmbd)/f_p_lmbd/f_v
 
 # ═══ Figure ════════════════════════════════════════════════════════
 
-X, Y = np.meshgrid(l_N, l_eta)
+l_d = l_N/a**2
+
+X, Y = np.meshgrid(l_d, l_eta)
 
 fig, ax = plt.subplots(1,1, figsize=(5,5))
 
@@ -64,15 +66,15 @@ ax.contour(X, Y, f_L, levels=[lmbd], colors='k', linestyles='--')
 ax.contour(X, Y, f_v, levels=[0.5], colors='k', linestyles=':')
 
 # Unfixing limit
-ax.axvline(lmbd, color='k')
+ax.axvline(lmbd/a**2, color='k')
 
 ax.set_xscale('log')
 ax.set_yscale('log')
 
-ax.set_xlim(min(l_N), max(l_N))
+ax.set_xlim(min(l_d), max(l_d))
 ax.set_ylim(min(l_eta), max(l_eta))
 
-ax.set_xlabel('total number $m$')
+ax.set_xlabel('density $d$')
 ax.set_ylabel('kinetic parameter $\eta$')
 
 ax.set_box_aspect(1)

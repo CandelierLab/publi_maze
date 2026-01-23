@@ -167,6 +167,6 @@ ani = animation.FuncAnimation(fig=fig, func=update,
                               interval=100, 
                               repeat=False)
 
-ani.save('Movies/corridor_closed.mp4')
+# ani.save('Movies/corridor_closed.mp4')
 
 plt.show()

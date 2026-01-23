@@ -8,6 +8,7 @@ __kernel void motion(
   __global const int *flw,
   __global uint *pos,
   __global uint *org,
+  __global uint *eng,
   __global const float *rnd
   ) {
 
@@ -28,6 +29,9 @@ __kernel void motion(
 
   // Stall
   if (p_move < rnd[id]) { return; }
+
+  // Energy
+  atom_inc(&eng[u]);
 
   // ─── Set origin
 

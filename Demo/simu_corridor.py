@@ -52,7 +52,7 @@ E.setup_display(Animation.maze.density, maze=M)
 E.animation.window.information.show_time = False
 E.animation.window.information.show_algorithm = False
 
-E.window.autoplay = False
+# E.window.autoplay = False
 
 # ═══ Simulation ═══════════════════════════════════════════════════════════
 
