@@ -71,8 +71,9 @@ class Engine:
     # Number of steps
     self.steps = None
 
-    # Maximal number of steps
+    # Computation limits
     self.max_steps = int(1e8)
+    self.max_energy = None
 
     # Trigger
     self.trigger = None
@@ -358,7 +359,8 @@ class Engine:
     # ─── End of simulation ─────────────────────
 
     if (self.steps is not None and iteration>=self.steps) or \
-       (self.max_steps is not None and iteration>=self.max_steps):
+       (self.max_steps is not None and iteration>=self.max_steps) or \
+       (self.max_energy is not None and np.all(self.energy>=self.max_energy)):
       self.running = False
       
   # ────────────────────────────────────────────────────────────────────────  

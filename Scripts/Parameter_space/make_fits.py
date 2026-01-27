@@ -1,5 +1,7 @@
 '''
-Make the fits
+Make zeta fits
+
+Data with maximal time
 '''
 
 # Reset command window display
@@ -43,8 +45,9 @@ ndpd = 16
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
-# Zeta random
-zeta_r = maze.zeta_random(algo, a)
+# Mode
+mode = 'Time' 
+# mode = 'Energy' 
 
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -52,7 +55,7 @@ n_dst = len(l_dst)
 n_eta = len(l_eta)
 
 # Base tag
-base_tag = 'Parameter space' + os.sep + algo + os.sep + f'a={a}' + os.sep
+base_tag = 'Parameter space' + os.sep + algo + os.sep + mode + os.sep + f'a={a}' + os.sep
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
@@ -88,7 +91,8 @@ for i, eta in enumerate(l_eta):
     l_Z = np.empty(0)
     l_k = np.empty(0)
     l_tau = np.empty(0)
-    l_energy = np.empty(0)
+    if mode=='Energy':
+      l_energy = np.empty(0)
 
     for fname in l_dir:
 
@@ -104,9 +108,10 @@ for i, eta in enumerate(l_eta):
       l_k = np.concatenate((l_k, k))
       l_tau = np.concatenate((l_tau, tau))
 
-      tau = np.round(tau).astype(int)
-      tau[tau>S['energy'].shape[1]-1] = S['energy'].shape[1]-1
-      l_energy = np.concatenate((l_energy, S['energy'][:, tau].flatten()))
+      if mode=='Energy':
+        tau = np.round(tau).astype(int)
+        tau[tau>S['energy'].shape[1]-1] = S['energy'].shape[1]-1
+        l_energy = np.concatenate((l_energy, S['energy'][:, tau].flatten()))
 
     # ─── Compute fields
 
@@ -114,14 +119,19 @@ for i, eta in enumerate(l_eta):
     f_z0[i,j] = np.nanmean(l_z0)
     f_Z[i,j] = np.nanmean(l_Z)
     f_tau[i,j] = np.nanmean(l_tau)
-    f_energy[i,j] = np.nanmean(l_energy)
+    if mode=='Energy':
+      f_energy[i,j] = np.nanmean(l_energy)
 
     print(f' {time.perf_counter()-tref:.02f} sec')
+
+    break
+  break
 
 out['solved'] = f_solved
 out['z0'] = f_z0
 out['Z'] = f_Z
 out['tau'] = f_tau
-out['energy'] = f_energy
+if mode=='Energy':
+  out['energy'] = f_energy
 
     

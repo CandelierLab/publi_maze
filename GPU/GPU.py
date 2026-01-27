@@ -248,7 +248,7 @@ class GPU_engine:
 
     # Import energy
     cl.enqueue_copy(self.queue, self.h_eng, self.d_eng)
-    self.engine.energy = self.h_eng
+    self.engine.energy = self.h_eng/self.engine.agents.N
     if self.engine.store_energy or (self.engine.storage is not None and self.engine.storage.save_energy):
       for k in range(self.multi):
         self.engine.l_energy[k].append(self.h_eng[k].item())
