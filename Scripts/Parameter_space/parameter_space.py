@@ -8,6 +8,7 @@ os.system('clear')
 
 # Standard packages
 import numpy as np
+import h5py
 
 # Graph
 from maze import maze
@@ -36,7 +37,7 @@ algo = 'Prims'
 # ─── Agents
 
 # Parameters
-ndpd = 4
+ndpd = 16
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
@@ -55,21 +56,28 @@ l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 # ─── Simulation
 
 # Runs
-n_runs = 1
+n_runs = 10
 n_multi = 100
 trigger = 0.9
 
 # Computation limit
 max_steps = int(1e5)
-max_energy = int(1e4)
+max_energy = int(1e5)
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
 for run in range(n_runs):
+      
+  # ─── Maze ───────────────────────────────────────────────────────────────
 
-  for dst in l_dst:
+  M = maze(size=a, algorithm=algo, seed=run)
+  M.create_LR_loop()
 
-    for eta in l_eta:
+  for eta in l_eta:
+
+    skip = False
+
+    for dst in np.flip(l_dst):
 
       # ─── Storage ─────────────────────────────
 
@@ -82,14 +90,26 @@ for run in range(n_runs):
       if strg.exists(): 
         continue
       
-      print(f'\n─── {algo} dst={dst}, eta={eta} ─── run {run:04d}', '─'*20)
+      print(f'\n─── {algo} eta={eta}, dst={dst} ─── run {run:04d}', '─'*20)
 
-      # ─── Maze ─────────────────────────────────────────────────────────────────
+      # ─── Skip condition ──────────────────────
 
-      M = maze(size=a, algorithm=algo, seed=run)
-      M.create_LR_loop()
+      if skip:
 
-      # ─── Engine ───────────────────────────────────────────────────────────────
+        print('Skipping computation.')
+
+        with h5py.File(strg.filepath, 'a') as hf:
+
+          # Parameters
+          hf['max_steps'] = -1 if max_steps is None else max_steps
+          hf['max_energy'] = -1 if max_energy is None else max_energy
+
+          # Results
+          hf['success'] = []
+          hf['energy'] = []
+          continue
+
+      # ─── Engine ─────────────────────────────────────────────────────────
 
       E = Engine(M.graph, storage=strg, multi=n_multi)
       E.storage.save_success = True
@@ -98,12 +118,12 @@ for run in range(n_runs):
       E.max_steps = max_steps
       E.max_energy = max_energy
 
-      # ─── Agents ───────────────────────────────────────────────────────────────
+      # ─── Agents ─────────────────────────────────────────────────────────
 
       N = int(dst*M.size) # density times the number of cases
       E.add_agents(N, eta)
 
-      # ═══ Simulation ═══════════════════════════════════════════════════════════
+      # ═══ Simulation ═════════════════════════════════════════════════════
 
       # Trigger
       E.trigger = trigger
@@ -111,3 +131,10 @@ for run in range(n_runs):
       # Run
       E.run()
       
+      # ═══ Stop condition ═════════════════════════════════════════════════
+
+      if np.all(E.success < E.trigger): 
+        '''
+        Skip lower densities if no maze were solved in the multiverse
+        '''
+        skip = True
