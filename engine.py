@@ -270,11 +270,16 @@ class Engine:
           bar.title = f'U 0/{self.multi}'
           bar()
 
-          for step in range(self.max_steps-1):
+          # for step in range(self.max_steps-1):
+          step = 0
+          while self.running:
+
             self.update(step)
+            step += 1
 
             # Stop simulation
-            if not self.running: break
+            # print(self.running)
+            # if not self.running: break
 
             # Update bar display
             if self.locked:
@@ -358,9 +363,10 @@ class Engine:
 
     # ─── End of simulation ─────────────────────
 
-    if (self.steps is not None and iteration>=self.steps) or \
-       (self.max_steps is not None and iteration>=self.max_steps) or \
-       (self.max_energy is not None and np.all(self.energy>=self.max_energy)):
+    if ((self.steps is not None and iteration>=self.steps-1) or \
+       (self.max_steps is not None and iteration>=self.max_steps-1)) and \
+       (self.max_energy is None or np.all(self.energy>=self.max_energy)):
+      
       self.running = False
       
   # ────────────────────────────────────────────────────────────────────────  
@@ -375,33 +381,46 @@ class Engine:
 
       with h5py.File(self.storage.filepath, 'a') as hf:
 
-        # ─── Success
+        # Parameters
+        hf['max_steps'] = -1 if self.max_steps is None else self.max_steps
+        hf['max_energy'] = -1 if self.max_energy is None else self.max_energy
 
-        if self.storage.save_success:
+        # print(len(self.l_success[0]), np.mean(self.energy))
 
-          # One last iteration
-          match self.platform.upper():
-            case 'GPU': self.gpu.step()
-            case 'CPU': self.cpu.step()
+        # Check resolution
+        if self.trigger is None or np.any(self.success>self.trigger):
+            
+          # # # # One last iteration
+          # # # match self.platform.upper():
+          # # #   case 'GPU': self.gpu.step()
+          # # #   case 'CPU': self.cpu.step()
 
-          hf['success'] = np.array(self.l_success, dtype=np.float16)
+          # ─── Success
 
-        # ─── Energy
+          if self.storage.save_success:
+            hf['success'] = np.array(self.l_success, dtype=np.float16)
 
-        if self.storage.save_energy:
+          # ─── Energy
 
-          hf['energy'] = np.array(self.l_energy, dtype=np.uint32)
+          if self.storage.save_energy:
+            hf['energy'] = np.array(self.l_energy, dtype=np.uint32)
 
-        # ─── Blanks
+          # ─── Blanks
 
-        if self.storage.save_blanks:
+          if self.storage.save_blanks:
 
-          # One last iteration
-          match self.platform.upper():
-            case 'GPU': self.gpu.step()
-            case 'CPU': self.cpu.step()
+            # One last iteration
+            match self.platform.upper():
+              case 'GPU': self.gpu.step()
+              case 'CPU': self.cpu.step()
 
-          hf['blanks'] = self.l_blanks
+            hf['blanks'] = self.l_blanks
+
+        else:
+
+          if self.storage.save_success: hf['success'] = []
+          if self.storage.save_energy:  hf['energy'] = []
+          if self.storage.save_blanks:  hf['blanks'] = []
         
     # ─── Display ───────────────────────────────
     

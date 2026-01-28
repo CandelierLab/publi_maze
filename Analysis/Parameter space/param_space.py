@@ -34,9 +34,6 @@ algo = 'Prims'
 # algo = 'Sidewinder'
 # algo = 'Wilsons'
 
-# Zeta random
-zeta_r = maze.zeta_random(algo, a)
-
 # ──────────────────────────────────────────────────────────────────────────
 
 # Base tag
@@ -87,7 +84,7 @@ ax[0].set_box_aspect(1)
 
 # ─── Energy ───────────────────────────────────────────────────────────────
 
-c = ax[1].pcolormesh(X, Y, np.log10(f_energy/X), cmap=cm, rasterized=True)
+c = ax[1].pcolormesh(X, Y, np.log10(f_energy/X/a**2), cmap=cm, rasterized=True, vmax=5)
 fig.colorbar(c, ax=ax[1])
 
 # ─── Plot settings

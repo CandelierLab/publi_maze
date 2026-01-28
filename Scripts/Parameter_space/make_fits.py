@@ -41,13 +41,9 @@ algo = 'Prims'
 # ─── Agents
 
 # Parameters
-ndpd = 16
+ndpd = 4
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
-
-# Mode
-mode = 'Time' 
-# mode = 'Energy' 
 
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -55,7 +51,7 @@ n_dst = len(l_dst)
 n_eta = len(l_eta)
 
 # Base tag
-base_tag = 'Parameter space' + os.sep + algo + os.sep + mode + os.sep + f'a={a}' + os.sep
+base_tag = 'Parameter space' + os.sep + algo + os.sep + f'a={a}' + os.sep
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
@@ -91,47 +87,62 @@ for i, eta in enumerate(l_eta):
     l_Z = np.empty(0)
     l_k = np.empty(0)
     l_tau = np.empty(0)
-    if mode=='Energy':
-      l_energy = np.empty(0)
+    l_energy = np.empty(0)
 
     for fname in l_dir:
 
       S = storage(p_dir + os.sep + fname)
 
-      # import sys
-      # sys.exit()
+      if S['success'].size:
+        '''
+        At least one maze was solved
+        '''
 
-      z0, Z, k, tau = fit_many(S['success'])
+        # import sys
+        # sys.exit()
 
-      l_z0 = np.concatenate((l_z0, z0))
-      l_Z = np.concatenate((l_Z, Z))
-      l_k = np.concatenate((l_k, k))
-      l_tau = np.concatenate((l_tau, tau))
+        z0, Z, k, tau = fit_many(S['success'])
 
-      if mode=='Energy':
-        tau = np.round(tau).astype(int)
-        tau[tau>S['energy'].shape[1]-1] = S['energy'].shape[1]-1
+        l_z0 = np.concatenate((l_z0, z0))
+        l_Z = np.concatenate((l_Z, Z))
+        l_k = np.concatenate((l_k, k))
+        l_tau = np.concatenate((l_tau, tau))
+
+        tau[np.isnan(tau)] = S['success'].shape[1]-1
+        tau[tau>S['success'].shape[1]-1] = S['success'].shape[1]-1
+        tau = np.round(tau).astype(int)        
         l_energy = np.concatenate((l_energy, S['energy'][:, tau].flatten()))
 
     # ─── Compute fields
 
-    f_solved[i,j] = 1 - np.count_nonzero(np.isnan(l_tau))/l_tau.size
-    f_z0[i,j] = np.nanmean(l_z0)
-    f_Z[i,j] = np.nanmean(l_Z)
-    f_tau[i,j] = np.nanmean(l_tau)
-    if mode=='Energy':
+    if not l_tau.size:
+      ''' 
+      No maze were solved
+      '''
+
+      f_solved[i,j] = 0
+      f_z0[i,j] = np.nan
+      f_Z[i,j] = np.nan
+      f_tau[i,j] = S['max_steps']
+      f_energy[i,j] = S['max_energy']*dst*a**2
+
+    else:
+      '''
+      At least one maze was solved
+      '''
+
+      f_solved[i,j] = 1 - np.count_nonzero(np.isnan(l_tau))/l_tau.size
+      f_z0[i,j] = np.nanmean(l_z0)
+      f_Z[i,j] = np.nanmean(l_Z)
+      f_tau[i,j] = np.nanmean(l_tau)
       f_energy[i,j] = np.nanmean(l_energy)
 
     print(f' {time.perf_counter()-tref:.02f} sec')
-
-    break
-  break
 
 out['solved'] = f_solved
 out['z0'] = f_z0
 out['Z'] = f_Z
 out['tau'] = f_tau
-if mode=='Energy':
-  out['energy'] = f_energy
+out['energy'] = f_energy
 
     

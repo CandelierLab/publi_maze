@@ -36,15 +36,15 @@ algo = 'Prims'
 # ─── Agents
 
 # Parameters
-ndpd = 16
+ndpd = 4
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
 # print('dst', l_dst)
 # print('eta', l_eta)
 
-# l_dst = np.array([l_dst[2]])
-# l_eta = np.array([l_eta[2]])
+# l_dst = np.array([l_dst[14]])
+# l_eta = np.array([l_eta[-1]])
 
 # print('dst', l_dst)
 # print('eta', l_eta)
@@ -52,21 +52,16 @@ l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 # import sys
 # sys.exit()
 
-# Mode
-# mode = 'Time'
-mode = 'Energy'
-
 # ─── Simulation
 
 # Runs
-n_runs = 10
+n_runs = 1
 n_multi = 100
 trigger = 0.9
 
 # Computation limit
-match mode:
-  case 'Time': max_steps = int(1e5)
-  case 'Energy': max_energy = 5000 #int(1e5)
+max_steps = int(1e5)
+max_energy = int(1e4)
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
@@ -78,7 +73,7 @@ for run in range(n_runs):
 
       # ─── Storage ─────────────────────────────
 
-      strg = storage('Parameter space' + os.sep + algo + os.sep + mode + os.sep +
+      strg = storage('Parameter space' + os.sep + algo + os.sep + os.sep +
                      f'a={a}' + os.sep +
                      f'density={dst:.03f} - eta={eta:.01f}' + os.sep +
                      f'run {run:04d}.h5')
@@ -87,7 +82,7 @@ for run in range(n_runs):
       if strg.exists(): 
         continue
       
-      print(f'\n─── {algo} ({mode}) dst={dst}, eta={eta} ─── run {run:04d}', '─'*20)
+      print(f'\n─── {algo} dst={dst}, eta={eta} ─── run {run:04d}', '─'*20)
 
       # ─── Maze ─────────────────────────────────────────────────────────────────
 
@@ -98,15 +93,10 @@ for run in range(n_runs):
 
       E = Engine(M.graph, storage=strg, multi=n_multi)
       E.storage.save_success = True
-
-      match mode:
-
-        case 'Time':
-          E.max_steps = max_steps
-
-        case 'Energy':
-          E.storage.save_energy = True
-          E.max_energy = max_energy
+      E.storage.save_energy = True
+      
+      E.max_steps = max_steps
+      E.max_energy = max_energy
 
       # ─── Agents ───────────────────────────────────────────────────────────────
 
@@ -120,3 +110,4 @@ for run in range(n_runs):
 
       # Run
       E.run()
+      
