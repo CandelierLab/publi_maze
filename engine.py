@@ -283,9 +283,11 @@ class Engine:
 
             # Update bar display
             if self.locked:
-              bar.title = f'L @ {int(self.steps/self.trigger_extra_factor)}'
+              LS = f'L @ {int(self.steps/self.trigger_extra_factor)}'
             else:
-              bar.title = f'U {np.count_nonzero(self.success>=self.trigger)}/{self.multi}'
+              LS = f'U {np.count_nonzero(self.success>=self.trigger)}/{self.multi}'
+
+            bar.title = LS + f' e°{np.round(np.mean(self.energy)):.0f}'
             bar()
 
       # === FOR DEBUGGING =======================
