@@ -41,9 +41,12 @@ algo = 'Prims'
 # ─── Agents
 
 # Parameters
-ndpd = 4
+ndpd = 16
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
+
+# l_dst = [100]
+# l_eta = [1000]
 
 # ──────────────────────────────────────────────────────────────────────────
 

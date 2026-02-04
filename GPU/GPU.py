@@ -243,15 +243,13 @@ class GPU_engine:
     cl.enqueue_copy(self.queue, self.h_nsl, self.d_nsl)
     self.engine.success = self.h_nsl/self.n_agents
     if self.engine.store_success or (self.engine.storage is not None and self.engine.storage.save_success):
-      for k in range(self.multi):
-        self.engine.l_success[k].append(self.engine.success[k].item())
+      self.engine.l_success = np.c_[self.engine.l_success, self.engine.success.astype(np.float16)]
 
     # Import energy
     cl.enqueue_copy(self.queue, self.h_eng, self.d_eng)
     self.engine.energy = self.h_eng/self.engine.agents.N
     if self.engine.store_energy or (self.engine.storage is not None and self.engine.storage.save_energy):
-      for k in range(self.multi):
-        self.engine.l_energy[k].append(self.h_eng[k].item())
+      self.engine.l_energy = np.c_[self.engine.l_energy, self.h_eng.astype(np.uint32)]
 
     # Import blanks
     if self.engine.store_blanks:

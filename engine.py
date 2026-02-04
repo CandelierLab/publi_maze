@@ -192,11 +192,11 @@ class Engine:
 
     # Reset success
     if self.store_success:
-      self.l_success = [[] for i in range(self.multi)]
+      self.l_success = np.zeros((self.multi,0), dtype=np.float16)
 
     # Reset energy
     if self.store_energy:
-      self.l_energy = [[] for i in range(self.multi)]
+      self.l_energy = np.zeros((self.multi,0), dtype=np.uint32)
 
     # Reset blanks
     if self.store_blanks:
@@ -387,8 +387,6 @@ class Engine:
         hf['max_steps'] = -1 if self.max_steps is None else self.max_steps
         hf['max_energy'] = -1 if self.max_energy is None else self.max_energy
 
-        # print(len(self.l_success[0]), np.mean(self.energy))
-
         # Check resolution
         if self.trigger is None or np.any(self.success>self.trigger):
             
@@ -400,12 +398,12 @@ class Engine:
           # ─── Success
 
           if self.storage.save_success:
-            hf['success'] = np.array(self.l_success, dtype=np.float16)
+            hf['success'] = self.l_success.astype(np.float16)
 
           # ─── Energy
 
           if self.storage.save_energy:
-            hf['energy'] = np.array(self.l_energy, dtype=np.uint32)
+            hf['energy'] = self.l_energy.astype(np.uint32)
 
           # ─── Blanks
 

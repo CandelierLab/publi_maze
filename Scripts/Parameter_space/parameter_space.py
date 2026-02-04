@@ -91,9 +91,8 @@ for run in range(1, n_runs):
       if strg.exists(): 
         continue
 
-      # Only the difficult squares
-      if eta<=100 or dst>=1: continue
-      # if dst<0.75: skip=True
+      # Only the easy squares
+      if eta>100 and dst<=1: continue
       
       print(f'\n─── {algo} eta={eta}, dst={dst} ─── run {run:04d}', '─'*10, datetime.datetime.now())
 
@@ -143,3 +142,6 @@ for run in range(1, n_runs):
         Skip lower densities if no maze were solved in the multiverse
         '''
         skip = True
+
+      # Clear engine
+      del E
