@@ -367,7 +367,7 @@ class Engine:
 
     if ((self.steps is not None and iteration>=self.steps-1) or \
        (self.max_steps is not None and iteration>=self.max_steps-1)) and \
-       (self.max_energy is None or np.all(self.energy>=self.max_energy)):
+       (self.max_energy is None or np.mean(self.energy)>=self.max_energy):
       
       self.running = False
       
