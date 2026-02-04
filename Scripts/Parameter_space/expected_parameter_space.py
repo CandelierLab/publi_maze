@@ -3,7 +3,7 @@ Expected parameter space
 '''
 
 # Reset command window display
-import os
+import os, sys
 os.system('clear')
 
 import numpy as np
@@ -20,7 +20,7 @@ plt.style.use('dark_background')
 a = 20
 d_deadend_loop = 10
 
-n_bins = 100
+n_bins = 200
 
 l_eta = np.geomspace(1, 1000, n_bins)
 l_N = np.geomspace(10, 10000, n_bins)
@@ -49,6 +49,7 @@ out['eta'] = l_eta
 v = np.zeros((l_eta.size, l_N.size))
 L = np.zeros((l_eta.size, l_N.size))
 p_lmbd = np.zeros((l_eta.size, l_N.size))
+p_mob = np.zeros((l_eta.size, l_N.size))
 
 with alive_bar(l_eta.size*l_N.size) as bar:
     
@@ -68,7 +69,7 @@ with alive_bar(l_eta.size*l_N.size) as bar:
  
         n_1 = np.roll(n_,1)
         n = n_1**2/(n_1 + eta) + n_*eta/(n_ + eta)
-
+        
         # Stop condition
         if np.argmax(n)>=Lmbd: break
 
@@ -80,6 +81,9 @@ with alive_bar(l_eta.size*l_N.size) as bar:
         L[i,j] = Lmbd
         p_lmbd[i,j] = 1
         continue
+
+      # Proportion of mobile agents
+      pmob = np.sum(n[n>=eta])/N
 
       # Profile
       n = np.flip(n[:Lmbd+1])
@@ -118,12 +122,17 @@ with alive_bar(l_eta.size*l_N.size) as bar:
 
       p_lmbd[i,j] = 1 - p_il
 
+      # ─── Proportion of mobile agents ──────────────────────────────────────
+
+      p_mob[i,j] = pmob
+
       bar()
 
 # Storage
 out['v'] = v
 out['L'] = L
 out['p_lmbd'] = p_lmbd
+out['p_mob'] = p_mob
 
 # ═══ Display ══════════════════════════════════════════════════════════════
 
