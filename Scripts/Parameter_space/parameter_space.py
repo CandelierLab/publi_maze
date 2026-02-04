@@ -3,10 +3,11 @@ Parameter space exploration
 '''
 
 # Reset command window display
-import os
+import os, sys
 os.system('clear')
 
 # Standard packages
+import datetime
 import numpy as np
 import h5py
 
@@ -66,7 +67,7 @@ max_energy = int(1e5)
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
-for run in range(n_runs):
+for run in range(1, n_runs):
       
   # ─── Maze ───────────────────────────────────────────────────────────────
 
@@ -89,8 +90,12 @@ for run in range(n_runs):
       # Check existence
       if strg.exists(): 
         continue
+
+      # Only the difficult squares
+      if eta<=100 or dst>=1: continue
+      # if dst<0.75: skip=True
       
-      print(f'\n─── {algo} eta={eta}, dst={dst} ─── run {run:04d}', '─'*20)
+      print(f'\n─── {algo} eta={eta}, dst={dst} ─── run {run:04d}', '─'*10, datetime.datetime.now())
 
       # ─── Skip condition ──────────────────────
 
