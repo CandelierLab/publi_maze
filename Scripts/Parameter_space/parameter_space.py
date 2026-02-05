@@ -92,7 +92,7 @@ for run in range(1, n_runs):
         continue
 
       # Only the easy squares
-      if eta>100 and dst<=1: continue
+      if eta>100 and dst<1: continue
       
       print(f'\n─── {algo} eta={eta}, dst={dst} ─── run {run:04d}', '─'*10, datetime.datetime.now())
 
