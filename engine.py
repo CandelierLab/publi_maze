@@ -381,6 +381,9 @@ class Engine:
 
     if self.storage is not None:
 
+      # Flush the GPU buffers
+      self.gpu.flush_buffers()
+
       with h5py.File(self.storage.filepath, 'a') as hf:
 
         # Parameters

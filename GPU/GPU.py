@@ -51,7 +51,6 @@ class GPU_engine:
     self.flow_depth = 32
     self.energy_depth = 32
 
-
     # Formats
     match self.squid_depth:
       case 16: self.squid_format = np.uint16
@@ -206,6 +205,13 @@ class GPU_engine:
     self.d_eng = cl.Buffer(ctx, mf.READ_WRITE, self.h_eng.nbytes)
     self.d_rnd = cl_array.zeros(self.queue, self.multi*self.n_agents, dtype=np.float32)
 
+    # ─── Buffers
+
+    self.b_i = -1
+    self.b_size = 1000
+    self.b_success = np.zeros((self.engine.multi, self.b_size), dtype=np.float16)
+    self.b_energy = np.zeros((self.engine.multi, self.b_size), dtype=np.uint32)
+
   # ────────────────────────────────────────────────────────────────────────
   def compute_densities(self):
     '''
@@ -243,14 +249,14 @@ class GPU_engine:
     cl.enqueue_copy(self.queue, self.h_nsl, self.d_nsl)
     self.engine.success = self.h_nsl/self.n_agents
     if self.engine.store_success or (self.engine.storage is not None and self.engine.storage.save_success):
-      self.engine.l_success = np.c_[self.engine.l_success, self.engine.success.astype(np.float16)]
+      self.b_success[:,self.b_i] = self.engine.success.astype(np.float16)
 
     # Import energy
     cl.enqueue_copy(self.queue, self.h_eng, self.d_eng)
     self.engine.energy = self.h_eng/self.engine.agents.N
     if self.engine.store_energy or (self.engine.storage is not None and self.engine.storage.save_energy):
-      self.engine.l_energy = np.c_[self.engine.l_energy, self.h_eng.astype(np.uint32)]
-
+      self.b_energy[:,self.b_i] = self.h_eng.astype(np.uint32)
+      
     # Import blanks
     if self.engine.store_blanks:
 
@@ -264,6 +270,12 @@ class GPU_engine:
     '''
     One step of the simulation
     '''
+
+    # Update buffer position
+    self.b_i += 1
+    if self.b_i == self.b_size:
+      self.flush_buffers()
+      self.b_i = 0
 
     # Prepare random array
     self.rng.fill_uniform(self.d_rnd)
@@ -283,3 +295,9 @@ class GPU_engine:
 
     # Re-compute the densities
     self.compute_densities()
+
+  # ────────────────────────────────────────────────────────────────────────
+  def flush_buffers(self):
+
+    self.engine.l_success = np.concatenate([self.engine.l_success, self.b_success], axis=1)
+    self.engine.l_energy = np.concatenate([self.engine.l_energy, self.b_energy], axis=1)

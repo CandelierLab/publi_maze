@@ -116,6 +116,10 @@ for i, eta in enumerate(l_eta):
         tau = np.round(tau).astype(int)        
         l_energy = np.concatenate((l_energy, S['energy'][:, tau].flatten()))
 
+        # print(tau)
+        # print(l_energy/dst/a**2)
+        # sys.exit()
+
     # ─── Compute fields
 
     if not l_tau.size:
