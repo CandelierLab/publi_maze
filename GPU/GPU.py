@@ -208,7 +208,7 @@ class GPU_engine:
     # ─── Buffers
 
     self.b_i = -1
-    self.b_size = 1000
+    self.b_size = 10000
     self.b_success = np.zeros((self.engine.multi, self.b_size), dtype=np.float16)
     self.b_energy = np.zeros((self.engine.multi, self.b_size), dtype=np.uint32)
 
@@ -299,5 +299,5 @@ class GPU_engine:
   # ────────────────────────────────────────────────────────────────────────
   def flush_buffers(self):
 
-    self.engine.l_success = np.concatenate([self.engine.l_success, self.b_success], axis=1)
-    self.engine.l_energy = np.concatenate([self.engine.l_energy, self.b_energy], axis=1)
+    self.engine.l_success = np.concatenate([self.engine.l_success, self.b_success[:,:self.b_i+1]], axis=1)
+    self.engine.l_energy = np.concatenate([self.engine.l_energy, self.b_energy[:,:self.b_i+1]], axis=1)
