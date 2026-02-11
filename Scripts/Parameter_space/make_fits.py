@@ -1,7 +1,6 @@
 '''
-Make zeta fits
-
-Data with maximal time
+Make fits of zeta
+Extract resolution time tau and energy per agent
 '''
 
 # Reset command window display
@@ -26,17 +25,7 @@ from storage import storage
 # ─── Maze
 
 a = 20
-
-# algo = 'AldousBroder'
-# algo = 'BacktrackingGenerator'
-# algo = 'BinaryTree'
-# algo = 'Division'
-# algo = 'GrowingTree'
-# algo = 'HuntAndKill'
-# algo = 'Kruskal'
 algo = 'Prims'
-# algo = 'Sidewinder'
-# algo = 'Wilsons'
 
 # ─── Agents
 
@@ -45,8 +34,7 @@ ndpd = 16
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
-# l_dst = [100]
-# l_eta = [1000]
+n_runs_max = 10
 
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -58,17 +46,21 @@ base_tag = 'Parameter space' + os.sep + algo + os.sep + f'a={a}' + os.sep
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
+def set_value(F, key, val):
+  F[key] = val
+  return F
+
 # Storage
-out = storage(base_tag + 'fields')
+F_global = storage(base_tag + 'fields')
 
-out['dst'] = l_dst
-out['eta'] = l_eta
+F_global['dst'] = l_dst
+F_global['eta'] = l_eta
 
-f_solved = np.zeros((n_eta, n_dst))
-f_z0 = np.zeros((n_eta, n_dst))
-f_Z = np.zeros((n_eta, n_dst))
-f_tau = np.zeros((n_eta, n_dst))
-f_energy = np.zeros((n_eta, n_dst))
+f_solved = np.zeros((n_eta, n_dst, n_runs_max))
+f_z0 = np.zeros((n_eta, n_dst, n_runs_max))
+f_Z = np.zeros((n_eta, n_dst, n_runs_max))
+f_tau = np.zeros((n_eta, n_dst, n_runs_max))
+f_energy = np.zeros((n_eta, n_dst, n_runs_max))
 
 for i, eta in enumerate(l_eta):
 
@@ -77,6 +69,19 @@ for i, eta in enumerate(l_eta):
     print(f'dst={dst} ─ eta={eta} ', end='', flush=True)
     tref = time.perf_counter()
 
+    # Parameter dir
+    p_dir = base_tag + f'density={dst:.03f} - eta={eta:.01f}'
+
+    # ─── Check fit file
+
+    F_local = storage(p_dir + os.sep + 'fits.h5')
+    if not F_local.exists():
+      F_local['solved'] = np.full(n_runs_max, np.nan)
+      F_local['z0'] = np.full(n_runs_max, np.nan)
+      F_local['Z'] = np.full(n_runs_max, np.nan)
+      F_local['tau'] = np.full(n_runs_max, np.nan)
+      F_local['energy'] = np.full(n_runs_max, np.nan)
+
     # ─── List runs
 
     p_dir = base_tag + f'density={dst:.03f} - eta={eta:.01f}'
@@ -84,72 +89,57 @@ for i, eta in enumerate(l_eta):
     l_dir = [d for d in L if d.startswith('run ')]
     n_runs = len(l_dir)
 
-    # ─── Fit and aggregate data
-
-    l_z0 = np.empty(0)
-    l_Z = np.empty(0)
-    l_k = np.empty(0)
-    l_tau = np.empty(0)
-    l_energy = np.empty(0)
+    # ─── Scan runs ─────────────────────────────
 
     for fname in l_dir:
 
-      S = storage(p_dir + os.sep + fname)
+      # ─── Check fit
 
-      if S['success'].size:
-        '''
-        At least one maze was solved
-        '''
+      run = int(fname[4:-3])
 
-        # import sys
-        # sys.exit()
+      if np.isnan(F_local['solved'][run]):
 
-        z0, Z, k, tau = fit_many(S['success'])
+        S = storage(p_dir + os.sep + fname)
 
-        l_z0 = np.concatenate((l_z0, z0))
-        l_Z = np.concatenate((l_Z, Z))
-        l_k = np.concatenate((l_k, k))
-        l_tau = np.concatenate((l_tau, tau))
+        # print('success', S['success'])
 
-        tau[np.isnan(tau)] = S['success'].shape[1]-1
-        tau[tau>S['success'].shape[1]-1] = S['success'].shape[1]-1
-        tau = np.round(tau).astype(int)        
-        l_energy = np.concatenate((l_energy, S['energy'][:, tau].flatten()))
+        if S['success'].size:
+          '''
+          At least one maze was solved
+          '''
 
-        # print(tau)
-        # print(l_energy/dst/a**2)
-        # sys.exit()
+          # Fit
+          z0, Z, k, tau = fit_many(S['success'])
 
-    # ─── Compute fields
+          solved = tau.size - np.count_nonzero(np.isnan(tau))
+          F_local['solved'] = set_value(F_local['solved'], run, solved)
+          F_local['z0'] = set_value(F_local['z0'], run, np.mean(z0))
+          F_local['Z'] = set_value(F_local['Z'], run, np.mean(Z))
+          F_local['tau'] = set_value(F_local['tau'], run, np.mean(tau))
 
-    if not l_tau.size:
-      ''' 
-      No maze were solved
-      '''
+          tau[np.isnan(tau)] = S['success'].shape[1]-1
+          tau[tau>S['success'].shape[1]-1] = S['success'].shape[1]-1
+          tau = np.round(tau).astype(int)        
+          F_local['energy'] = set_value(F_local['energy'], run, np.mean(S['energy'][:, tau].flatten())/dst/a**2)
+        
+        else:
+          
+          F_local['solved'] = set_value(F_local['solved'], run, 0)
+          
+    # ─── Aggregate values ──────────────────────
 
-      f_solved[i,j] = 0
-      f_z0[i,j] = np.nan
-      f_Z[i,j] = np.nan
-      f_tau[i,j] = S['max_steps']
-      f_energy[i,j] = S['max_energy']*dst*a**2
-
-    else:
-      '''
-      At least one maze was solved
-      '''
-
-      f_solved[i,j] = 1 - np.count_nonzero(np.isnan(l_tau))/l_tau.size
-      f_z0[i,j] = np.nanmean(l_z0)
-      f_Z[i,j] = np.nanmean(l_Z)
-      f_tau[i,j] = np.nanmean(l_tau)
-      f_energy[i,j] = np.nanmean(l_energy)
+    f_solved[i,j,:] = F_local['solved']
+    f_z0[i,j,:] = F_local['z0']
+    f_Z[i,j,:] = F_local['Z']
+    f_tau[i,j,:] = F_local['tau']
+    f_energy[i,j,:] = F_local['energy']
 
     print(f' {time.perf_counter()-tref:.02f} sec')
 
-out['solved'] = f_solved
-out['z0'] = f_z0
-out['Z'] = f_Z
-out['tau'] = f_tau
-out['energy'] = f_energy
+F_global['solved'] = f_solved
+F_global['z0'] = f_z0
+F_global['Z'] = f_Z
+F_global['tau'] = f_tau
+F_global['energy'] = f_energy
 
     

@@ -38,7 +38,7 @@ algo = 'Prims'
 # ─── Agents
 
 # Parameters
-ndpd = 16
+ndpd = 2
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
@@ -57,13 +57,13 @@ l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 # ─── Simulation
 
 # Runs
-n_runs = 9
-n_multi = 100
+n_runs = 5
+n_multi = 10
 trigger = 0.9
 
 # Computation limit
-max_steps = int(1e5)
-max_energy = int(1e5)
+max_steps = int(1e3)
+max_energy = int(1e3)
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 
@@ -82,7 +82,7 @@ for run in range(1, n_runs):
 
       # ─── Storage ─────────────────────────────
 
-      strg = storage('Parameter space' + os.sep + algo + os.sep + os.sep +
+      strg = storage('Parameter space 2' + os.sep + algo + os.sep + os.sep +
                      f'a={a}' + os.sep +
                      f'density={dst:.03f} - eta={eta:.01f}' + os.sep +
                      f'run {run:04d}.h5')
@@ -92,8 +92,7 @@ for run in range(1, n_runs):
         continue
 
       # Only the easy squares
-      if eta>100 and dst<1: continue
-      
+      # if eta>100 and dst<1: continue
       
       print(f'\n─── {algo} eta={eta}, dst={dst} ─── run {run:04d}', '─'*10, datetime.datetime.now())
 

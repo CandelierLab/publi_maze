@@ -1,6 +1,6 @@
 '''
 ANALYSIS
-Kinetic average zeta curves and fit
+Parameter space: resolutino time and energy per agent
 '''
 
 # Reset command window display
@@ -22,17 +22,10 @@ from storage import storage
 # ─── Maze
 
 a = 20
-
-# algo = 'AldousBroder'
-# algo = 'BacktrackingGenerator'
-# algo = 'BinaryTree'
-# algo = 'Division'
-# algo = 'GrowingTree'
-# algo = 'HuntAndKill'
-# algo = 'Kruskal'
 algo = 'Prims'
-# algo = 'Sidewinder'
-# algo = 'Wilsons'
+
+# l_runs = [1,2]
+l_runs = []
 
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -49,6 +42,15 @@ l_dst = F['dst']
 l_eta = F['eta']
 f_tau = F['tau']
 f_energy = F['energy']
+
+# ─── Run filter ────────────────────────────────
+
+# Runs
+if l_runs is None or not len(l_runs):
+  l_runs = np.arange(f_tau.shape[2])
+
+f_tau = np.nanmean(f_tau[:,:,l_runs], axis=2)
+f_energy = np.nanmean(f_energy[:,:,l_runs], axis=2)
 
 # ═══ Figure ════════════════════════════════════════════════════════
 
@@ -84,7 +86,7 @@ ax[0].set_box_aspect(1)
 
 # ─── Energy ───────────────────────────────────────────────────────────────
 
-c = ax[1].pcolormesh(X, Y, np.log10(f_energy/X/a**2), cmap=cm, rasterized=True, vmax=5)
+c = ax[1].pcolormesh(X, Y, np.log10(f_energy), cmap=cm, rasterized=True)
 fig.colorbar(c, ax=ax[1])
 
 # ─── Plot settings

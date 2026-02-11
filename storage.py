@@ -34,23 +34,45 @@ class storage(UserDict):
       os.makedirs(dir, exist_ok=True)
 
   # ────────────────────────────────────────────────────────────────────────
-  def __str__(self):
-     
-    def visitor_func(name, node):
+  def __str__(self):   
+    '''
+    Affiche récursivement l'arborescence d'un fichier HDF5 avec indentation.
+    '''
 
-      global s
+    def str_node(node, prefix='', is_last=True):
+      """
+      Affiche récursivement un nœud HDF5 avec indentation.
+      
+      Args:
+          node: Le nœud HDF5 à afficher
+          prefix (str): Le préfixe d'indentation
+          is_last (bool): Indique si c'est le dernier élément
+      """
+
+      connector = '└── ' if is_last else '├── '
+      
       s = ''
 
       if isinstance(node, h5py.Dataset):
-        s += node.name + f' {node.shape}'
+        s += f'{prefix}{connector}{node.name.split("/")[-1]} {node.shape} ({node.dtype})\n'
       else:
-        s += node.name
+        s += f'{prefix}{connector}{node.name.split("/")[-1]}/\n'
 
-    with h5py.File(self.filepath, 'r') as f:
+      # Récursion pour les enfants
+      if isinstance(node, h5py.Group):
+        items = list(node.items())
+        for i, (key, child) in enumerate(items):
+          is_last_child = (i == len(items) - 1)
+          extension = '    ' if is_last else '│   '
+          s += str_node(child, prefix + extension, is_last_child)
 
-      f.visititems(visitor_func)
+      return s
 
-      # print(f.keys())
+    s = '─'*50 + '\n'
+    s += self.filepath + '\n'
+
+    with h5py.File(self.filepath, 'r') as f:      
+      s += str_node(f, '', True)
 
     return s
 
@@ -117,6 +139,6 @@ class storage(UserDict):
 
   # ────────────────────────────────────────────────────────────────────────
   @staticmethod
-  def list(tag):
+  def list(tag=''):
 
     return os.listdir(storage.root() + tag)
