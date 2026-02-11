@@ -13,7 +13,7 @@ os.system('clear')
 # ═══ Parameters ═══════════════════════════════════════════════════════════
 
 # Run
-run = 1
+run = 4
 
 a = 20
 algo = 'Prims'
@@ -40,8 +40,13 @@ for D in os.listdir(src):
   
   for d in os.listdir(src + D):
 
+    try:
+      drun = int(d[4:-3])
+    except:
+      continue
+
     # Check run correspondence
-    if int(d[4:-3]) == run:
+    if drun == run:
       
       print(D, d)
 

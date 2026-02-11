@@ -27,6 +27,10 @@ algo = 'Prims'
 # l_runs = [1,2]
 l_runs = []
 
+# Computation limits
+max_steps = int(1e5)
+max_energy = int(1e5)
+
 # ──────────────────────────────────────────────────────────────────────────
 
 # Base tag
@@ -52,6 +56,9 @@ if l_runs is None or not len(l_runs):
 f_tau = np.nanmean(f_tau[:,:,l_runs], axis=2)
 f_energy = np.nanmean(f_energy[:,:,l_runs], axis=2)
 
+f_tau[np.isnan(f_tau)] = max_steps
+f_energy[np.isnan(f_energy)] = max_energy
+
 # ═══ Figure ════════════════════════════════════════════════════════
 
 plt.style.use('dark_background')
@@ -70,7 +77,7 @@ fig.colorbar(c, ax=ax[0])
 # ─── Plot settings
 
 # Labels
-ax[0].set_title('resolution time')
+ax[0].set_title('resolution time $\\tau$')
 ax[0].set_xlabel('density $d$')
 ax[0].set_ylabel('kinetic parameter $\eta$')
 
@@ -86,13 +93,13 @@ ax[0].set_box_aspect(1)
 
 # ─── Energy ───────────────────────────────────────────────────────────────
 
-c = ax[1].pcolormesh(X, Y, np.log10(f_energy), cmap=cm, rasterized=True)
+c = ax[1].pcolormesh(X, Y, np.log10(f_energy), cmap=cm, vmin=2, vmax=5, rasterized=True)
 fig.colorbar(c, ax=ax[1])
 
 # ─── Plot settings
 
 # Labels
-ax[1].set_title('energy')
+ax[1].set_title('energy/agent')
 ax[1].set_xlabel('density $d$')
 ax[1].set_ylabel('kinetic parameter $\eta$')
 
