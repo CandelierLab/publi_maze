@@ -25,7 +25,6 @@ from storage import storage
 a = 20
 algo = 'Prims'
 
-# l_runs = [1,2]
 l_runs = []
 
 # Computation limits
@@ -70,23 +69,6 @@ f_energy[np.isnan(f_energy)] = max_energy
 
 # ─── Colormap ──────────────────────────────────
 
-# cdict = {'red':   [[0.0,  0.0, 0.0],
-#                    [0.10, 0.0, 0.0],
-#                    [0.15, 0.0, 0.0],
-#                    [0.75, 1.0, 1.0],
-#                    [1.0,  1.0, 1.0]],
-#          'green': [[0.0,  1.0, 1.0],
-#                    [0.10, 0.8, 0.8],
-#                    [0.15, 0.2, 0.2],
-#                    [0.40, 0.0, 0.0],
-#                    [0.90, 1.0, 1.0],
-#                    [1.0,  1.0, 1.0]],
-#          'blue':  [[0.0,  1.0, 1.0],
-#                    [0.10, 1.0, 1.0],
-#                    [0.15, 0.8, 0.8],
-#                    [0.75, 0.0, 0.0],
-#                    [1.0,  1.0, 1.0]]}
-
 cdict = {'red':   [[0.0,  0.0, 0.0],
                    [0.08, 0.0, 0.0],
                    [0.15, 0.0, 0.0],
@@ -96,7 +78,7 @@ cdict = {'red':   [[0.0,  0.0, 0.0],
          'green': [[0.0,  0.0, 0.0],
                    [0.08, 0.0, 0.0],
                    [0.15, 0.8, 0.8],
-                   [0.25, 0.2, 0.2],
+                   [0.25, 0.4, 0.4],
                    [0.40, 0.0, 0.0],
                    [0.90, 1.0, 1.0],
                    [1.0,  1.0, 1.0]],
@@ -125,6 +107,9 @@ print((np.min(np.log10(f_energy))-vmin_eng)/(vmax_eng - vmin_eng))
 
 c = ax[0].pcolormesh(X, Y, np.log10(f_tau), cmap=cm, vmin=vmin_tau, vmax=vmax_tau, rasterized=True)
 fig.colorbar(c, ax=ax[0])
+
+# Expected length
+# ax[0].contour(X, Y, f_tau, levels=[1000], colors='w', linestyles='--')
 
 # ─── Plot settings
 

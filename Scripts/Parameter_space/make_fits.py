@@ -36,6 +36,12 @@ l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
 n_runs_max = 10
 
+# l_eta = [l_eta[40].item()]
+# l_dst = [l_dst[13].item()]
+# print(l_eta)
+# print(l_dst)
+# sys.exit()
+
 # ──────────────────────────────────────────────────────────────────────────
 
 n_dst = len(l_dst)
@@ -96,12 +102,10 @@ for i, eta in enumerate(l_eta):
       # ─── Check fit
 
       run = int(fname[4:-3])
-
+        
       if np.isnan(F_local['solved'][run]):
 
         S = storage(p_dir + os.sep + fname)
-
-        # print('success', S['success'])
 
         if S['success'].size:
           '''
@@ -125,6 +129,10 @@ for i, eta in enumerate(l_eta):
         else:
           
           F_local['solved'] = set_value(F_local['solved'], run, 0)
+          F_local['z0'] = set_value(F_local['z0'], run, np.nan)
+          F_local['Z'] = set_value(F_local['Z'], run, np.nan)
+          F_local['tau'] = set_value(F_local['tau'], run, np.nan)
+          F_local['energy'] = set_value(F_local['energy'], run, np.nan)
           
     # ─── Aggregate values ──────────────────────
 

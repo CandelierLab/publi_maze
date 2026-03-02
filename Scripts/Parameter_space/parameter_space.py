@@ -57,7 +57,7 @@ l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 # ─── Simulation
 
 # Runs
-n_runs = 9
+n_runs = 10
 n_multi = 100
 trigger = 0.9
 
@@ -88,13 +88,9 @@ for run in range(1, n_runs):
                      f'run {run:04d}.h5')
 
       # Check existence
-      if strg.exists(): 
+      if strg.exists():
         continue
-
-      # Only the easy squares
-      if eta>100 and dst<1: continue
-      
-      
+            
       print(f'\n─── {algo} eta={eta}, dst={dst} ─── run {run:04d}', '─'*10, datetime.datetime.now())
 
       # ─── Skip condition ──────────────────────
