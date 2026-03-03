@@ -169,24 +169,26 @@ class Engine:
     self.animation.colormap.range = [vmin, vmax]
 
   # ────────────────────────────────────────────────────────────────────────
-  def run(self):
+  def run(self, skip_checks=False):
     '''
     Run the simulation
     '''
 
     # ─── Checks ────────────────────────────────
 
-    # ─── No animation
-    if self.animation is None:
-    
-      # Number of steps
-      if self.trigger is None and self.steps is None:
-        warnings.warn('The number of steps must be defined when there is no visualization.')
+    if not skip_checks:
+
+      # ─── No animation
+      if self.animation is None:
       
-      # Storage
-      if self.storage is None:
-        warnings.warn('A storage location must be defined when there is no visualization.')
-        return
+        # Number of steps
+        if self.trigger is None and self.steps is None:
+          warnings.warn('The number of steps must be defined when there is no visualization.')
+        
+        # Storage
+        if self.storage is None:
+          warnings.warn('A storage location must be defined when there is no visualization.')
+          return
 
     # ─── Initialization ────────────────────────
 
@@ -365,6 +367,10 @@ class Engine:
 
     # ─── End of simulation ─────────────────────
 
+    # if ((self.steps is not None and iteration>=self.steps-1) or \
+    #    (self.max_steps is not None and iteration>=self.max_steps-1)) or \
+    #    (self.max_energy is not None and np.mean(self.energy)>=self.max_energy):
+      
     if ((self.steps is not None and iteration>=self.steps-1) or \
        (self.max_steps is not None and iteration>=self.max_steps-1)) and \
        (self.max_energy is None or np.mean(self.energy)>=self.max_energy):
@@ -376,13 +382,13 @@ class Engine:
     '''
     Operations to do when the simulation is over
     '''
-    
+
+    # Flush the GPU buffers
+    self.gpu.flush_buffers()
+
     # ─── Storage ───────────────────────────────
 
     if self.storage is not None:
-
-      # Flush the GPU buffers
-      self.gpu.flush_buffers()
 
       with h5py.File(self.storage.filepath, 'a') as hf:
 

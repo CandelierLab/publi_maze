@@ -38,12 +38,14 @@ algo = 'Prims'
 # ─── Agents
 
 # Parameters
-ndpd = 16
+ndpd = 2
 l_dst = np.round(np.logspace(-1, 2, ndpd*3+1)*1000)/1000
 l_eta = np.round(np.logspace(0, 3, ndpd*3+1)*10)/10
 
-# print('dst', l_dst)
-# print('eta', l_eta)
+print('dst', l_dst)
+print('eta', l_eta)
+
+sys.exit()
 
 # l_dst = np.array([l_dst[14]])
 # l_eta = np.array([l_eta[-1]])

@@ -13,7 +13,7 @@ os.system('clear')
 # ═══ Parameters ═══════════════════════════════════════════════════════════
 
 # Run
-run = 4
+run = 8
 
 a = 20
 algo = 'Prims'
