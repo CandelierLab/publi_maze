@@ -174,8 +174,11 @@ class GPU_engine:
     self.h_flw = np.zeros((self.multi, self.n_nodes, dmax), dtype=self.flow_format)
 
     # Solution
-    solution = np.sort(self.engine.graph.solution[0]).astype(self.squid_format)
-    solution = np.insert(solution, 0, solution.size)
+    if self.engine.graph.solution is None:
+      solution = np.array([-1])
+    else:
+      solution = np.sort(self.engine.graph.solution[0]).astype(self.squid_format)
+      solution = np.insert(solution, 0, solution.size)
     self.h_nsl = np.zeros(self.multi, dtype=self.denst_format)
 
     # Energy

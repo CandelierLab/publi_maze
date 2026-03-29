@@ -59,13 +59,13 @@ sys.exit()
 # ─── Simulation
 
 # Runs
-n_runs = 10
+n_runs = 1
 n_multi = 100
 trigger = 0.9
 
 # Computation limit
-max_steps = int(1e5)
-max_energy = int(1e5)
+max_steps = int(1e4)
+max_energy = int(1e4)
 
 # ═══ Computation ══════════════════════════════════════════════════════════
 

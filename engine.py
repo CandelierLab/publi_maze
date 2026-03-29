@@ -156,7 +156,13 @@ class Engine:
     vmax = 1
 
     if self.graph.solution is None:
-      vmax = max(1, 3*self.agents.N/self.graph.number_of_positions)
+      if self.animation.log_densities:
+
+        vmin = -1
+        vmax = np.ceil(np.log10(self.agents.N))
+
+      else:
+        vmax = max(1, 3*self.agents.N/self.graph.number_of_positions)
     else:
       if self.animation.log_densities:
 

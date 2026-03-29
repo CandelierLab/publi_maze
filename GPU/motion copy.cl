@@ -12,9 +12,6 @@ __kernel void motion(
   __global const float *rnd
   ) {
 
-  // Softmax inverse temperature (programmer-defined)
-  const float gamma = 5.0f;
-
   // ─── Indices ────────────────────────────────
 
   // Agent id
@@ -42,56 +39,59 @@ __kernel void motion(
 
   // ─── Position ──────────────────────────────────────────────────────────
 
+  // ─── First pass: max flow and number of options
+
   uint ii = pos[id]*dmax[0];
 
-  // ─── First pass:
-  // Find max flow on valid outgoing edges (for stable softmax)
-
+  // Initialization
+  int nopt = 1;
   int fmax = flw[uuu + ii];
-  uint last_k = 0;
 
-  for (uint k=0; k<dmax[0]; k++) {
+  for (uint k=1; k<dmax[0]; k++) {
 
     // Loop only through edges
     if (edge[ii + k]==-1) { break; }
 
     int f = flw[uuu + ii + k];
-    if (f > fmax) { fmax = f; }
-    last_k = k;
+    
+    if (f>fmax) {
+      fmax = f;
+      nopt = 1;
+    } else if (f==fmax) {
+      nopt++;
+    }
+
   }
 
-  // ─── Second pass:
-  // Denominator of softmax
+  // ─── Second pass: select an option
 
-  // Beta
-  float beta = 0.2f;
-  // float beta = gamma/dns[uu + pos[id]];
+  // Chosen option
+  char opt = 0;
 
-  float sum_exp = 0.0f;
-
-  for (uint k=0; k<=last_k; k++) {
-    float z = (float)flw[uuu + ii + k];
-    sum_exp += exp(beta*(z - (float)fmax));
+  if (nopt>1) {
+    // NB: a new random number is generated from the previous one
+    float r = rnd[id]*18;
+    opt = (char) (nopt*(r-((int) r)));
   }
 
-  // Third pass: sample direction from softmax probabilities
-  // NB: a new random number is generated from the previous one
-  float rr = rnd[id]*18.0f;
-  float r = rr - floor(rr);
-  float cdf = 0.0f;
+  // Current option
+  char copt = 0;
 
-  for (uint k=0; k<=last_k; k++) {
-    float z = (float)flw[uuu + ii + k];
-    float p = exp(beta*(z - (float)fmax)) / sum_exp;
-    cdf += p;
+  for (uint k=0; k<dmax[0]; k++) {
+    if (flw[uuu + ii + k]==fmax) { 
 
-    // last_k guard avoids numerical corner-cases when cdf < 1 due to rounding
-    if (r <= cdf || k == last_k) {
-      pos[id] = edge[ii + k];
-      break;
+      if (copt==opt) {
+        
+        // New position
+        pos[id] = edge[ii + k];
+
+        // Break
+        break;
+
+      } else { copt++; }
     }
   }
 
-  // printf("id=%i, beta=%f, r=%f\n", id, beta, r);
+  // printf("id=%i, nopt=%i, opt=%i\n", id, nopt, opt);
   
 }

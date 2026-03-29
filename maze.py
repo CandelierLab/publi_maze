@@ -289,11 +289,11 @@ class maze:
     for i in range(self.Y):
 
       # Left
-      if i!=self.solution_wall['left']:
+      if not hasattr(self, 'solution_wall') or i!=self.solution_wall['left']:
         walls.append([[0, i],[0, i+1]])
 
       # Right
-      if i!=self.solution_wall['right']:
+      if not hasattr(self, 'solution_wall') or i!=self.solution_wall['right']:
         walls.append([[self.X, i],[self.X, i+1]])
 
     # --- Inner walls
